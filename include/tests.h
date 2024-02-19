@@ -10,7 +10,7 @@
  * *begin time count*
  * 1. Push 10^6 integer values.
  * 2. Pop half of elements and push quarter.
- * 3. Repeat step 2 while there are more then 10^5 elements in steck (9 times).
+ * 3. Repeat step 2 while there are more then 10^5 elements in steck (9 times)
  * *end time count*
  */
 void Test1 (void);

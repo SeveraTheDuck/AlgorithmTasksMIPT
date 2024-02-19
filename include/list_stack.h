@@ -16,12 +16,12 @@ enum list_stack_error
 };
 
 /**
- * @brief list_stack_error_t type is used for return actions and uses stack_error enum values.
+ * @brief list_stack_error_t type is used for return actions and uses stack_error enum values
  */
 typedef int list_stack_error_t;
 
 /**
- * @brief Struct of each node with stack data. Includes pointer to data and pointer to the next node. 
+ * @brief Struct of each node with stack data. Includes pointer to data and pointer to the next node.
  */
 struct list_node
 {
@@ -42,7 +42,7 @@ struct list_stack
 /**
  * @brief Makes a stack with initial values.
  * @param stack_elem_size is size of each element in bytes
- * @return pointer to the made stack 
+ * @return pointer to the made stack
  */
 struct list_stack*
 ListStackConstructor (const size_t stack_elem_size);
@@ -62,7 +62,7 @@ ListStackDestructor (struct list_stack* const stk);
  * @return Error status
  */
 list_stack_error_t
-ListStackPush (struct list_stack* const stk, 
+ListStackPush (struct list_stack* const stk,
                const  void*       const push_value);
 
 /**

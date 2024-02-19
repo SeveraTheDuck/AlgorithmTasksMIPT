@@ -7,7 +7,7 @@
 #include <assert.h>
 
 /**
- * @brief stack_error enum signalizes whether there was an error during the process or not
+ * @brief stack_error enum signalizes whether there was an error during the process or not.
  */
 enum stack_error
 {
@@ -36,7 +36,7 @@ struct stack
  * @brief Makes a stack with initial values.
  * @param stack_initial_capacity is stack data array initial capacity
  * @param stack_elem_size is size of each element of data array in bytes
- * @return pointer to the made stack 
+ * @return pointer to the made stack
  */
 struct stack*
 StackConstructor (const size_t stack_initial_capacity,
@@ -57,7 +57,7 @@ StackDestructor (struct stack* const stk);
  * @return Error status
  */
 stack_error_t
-StackPush (struct stack* const stk, 
+StackPush (struct stack* const stk,
            const  void*  const push_value);
 
 /**

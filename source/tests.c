@@ -21,7 +21,7 @@ void Test1 (void)
     int push_value = 0;
     int pop_value  = 0;
 
-    struct stack* array_stk = 
+    struct stack* array_stk =
         StackConstructor (ARRAY_STACK_INITIAL_CAPACITY, sizeof (int));
 
     struct list_stack* list_stk = ListStackConstructor (sizeof (int));
@@ -42,7 +42,7 @@ void Test1 (void)
 
     for (size_t i = 0; i < TEST1_ITERATION_NUMBER; ++i)
     {
-        internal_iterator = 
+        internal_iterator =
             array_stk -> data_array_size / TEST1_ITERATION_MULTIPLIER;
 
         for (size_t j = 0; j < internal_iterator; ++j)
@@ -75,7 +75,7 @@ void Test1 (void)
 
     for (size_t i = 0; i < TEST1_ITERATION_NUMBER; ++i)
     {
-        internal_iterator = 
+        internal_iterator =
             list_stk -> num_of_elements / TEST1_ITERATION_MULTIPLIER;
 
         for (size_t j = 0; j < internal_iterator; ++j)
@@ -107,7 +107,7 @@ void Test2 (void)
     int push_value = 0;
     int pop_value  = 0;
 
-    struct stack* array_stk = 
+    struct stack* array_stk =
         StackConstructor (ARRAY_STACK_INITIAL_CAPACITY, sizeof (int));
 
     struct list_stack* list_stk = ListStackConstructor (sizeof (int));
@@ -142,7 +142,7 @@ void Test2 (void)
 
     for (size_t i = 0; i < TEST1_ITERATION_NUMBER; ++i)
     {
-        internal_iterator = 
+        internal_iterator =
             array_stk -> data_array_size / TEST1_ITERATION_MULTIPLIER;
 
         for (size_t j = 0; j < internal_iterator; ++j)
@@ -189,7 +189,7 @@ void Test2 (void)
 
     for (size_t i = 0; i < TEST1_ITERATION_NUMBER; ++i)
     {
-        internal_iterator = 
+        internal_iterator =
             list_stk -> num_of_elements / TEST1_ITERATION_MULTIPLIER;
 
         for (size_t j = 0; j < internal_iterator; ++j)
@@ -221,7 +221,7 @@ void Test3 (void)
     int push_value = 0;
     int pop_value  = 0;
 
-    struct stack* array_stk = 
+    struct stack* array_stk =
         StackConstructor (ARRAY_STACK_INITIAL_CAPACITY, sizeof (int));
 
     struct list_stack* list_stk = ListStackConstructor (sizeof (int));
@@ -229,8 +229,8 @@ void Test3 (void)
     //-------------------------------------------------------------------------
     // array stack part
     //-------------------------------------------------------------------------
-    
-    // push 10^6 values 
+
+    // push 10^6 values
     for (size_t i = 0; i < TEST_ELEM_NUMBER; ++i)
     {
         push_value = rand ();
@@ -259,8 +259,8 @@ void Test3 (void)
      //-------------------------------------------------------------------------
     // list stack part
     //-------------------------------------------------------------------------
-    
-    // push 10^6 values 
+
+    // push 10^6 values
     for (size_t i = 0; i < TEST_ELEM_NUMBER; ++i)
     {
         push_value = rand ();

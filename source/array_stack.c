@@ -27,7 +27,7 @@ StackConstructor (const size_t stack_initial_capacity,
 
     if (StackRealloc (stk) == ERROR_OCCURED)
         return ERROR_OCCURED;
-    
+
     return stk;
 }
 
@@ -52,7 +52,7 @@ StackDestructor (struct stack* const stk)
 }
 
 stack_error_t
-StackPush (struct stack* const stk, 
+StackPush (struct stack* const stk,
            const  void*  const push_value)
 {
     assert (stk);
@@ -67,7 +67,7 @@ StackPush (struct stack* const stk,
     }
 
     /* push */
-    void* const dest_ptr = 
+    void* const dest_ptr =
         StackGetElemPtrByIndex (stk, stk -> data_array_size);
     stk -> data_array_size++;
 
@@ -98,7 +98,7 @@ StackPop (struct stack* const stk,
     stk -> data_array_size--;
 
     /* realloc */
-    if (stk -> data_array_size <= 
+    if (stk -> data_array_size <=
         stk -> data_array_capacity / (STACK_DATA_ARRAY_EXPANSION_MULTIPLIER *
                                       STACK_DATA_ARRAY_EXPANSION_MULTIPLIER))
     {
@@ -136,7 +136,7 @@ StackGetElemPtrByIndex (const struct stack* const stk,
         return NULL;
     }
 
-    return (void*) ((char*) stk -> data_array + 
+    return (void*) ((char*) stk -> data_array +
                             elem_index * stk -> elem_size);
 }
 

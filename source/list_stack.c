@@ -14,7 +14,7 @@ ListNodeDestructor (struct list_node* const node,
 struct list_stack*
 ListStackConstructor (const size_t stack_elem_size)
 {
-    struct list_stack* const stk = 
+    struct list_stack* const stk =
         (struct list_stack* const) calloc (1, sizeof (struct list_stack));
     if (stk == NULL)
         return NULL;
@@ -22,7 +22,7 @@ ListStackConstructor (const size_t stack_elem_size)
     stk -> list_head = NULL;
     stk -> num_of_elements = LIST_STACK_NULL_SIZE;
     stk -> elem_size = stack_elem_size;
-    
+
     return stk;
 }
 
@@ -49,13 +49,13 @@ ListStackDestructor (struct list_stack* const stk)
 }
 
 list_stack_error_t
-ListStackPush (struct list_stack* const stk, 
+ListStackPush (struct list_stack* const stk,
                const  void*       const push_value)
 {
     assert (stk);
     assert (push_value);
 
-    struct list_node* const new_node = 
+    struct list_node* const new_node =
         ListNodeConstructor (push_value, stk -> elem_size);
     if (new_node == NULL)
         return LIST_STACK_ERROR_OCCURED;
@@ -83,7 +83,7 @@ ListStackPop (struct list_stack* const stk,
 
     stk -> list_head = new_head;
     stk -> num_of_elements--;
-    
+
     return LIST_STACK_SUCCESS;
 }
 
@@ -108,7 +108,7 @@ ListNodeConstructor (const void*  const data,
 {
     assert (data);
 
-    struct list_node* const new_node = 
+    struct list_node* const new_node =
         (struct list_node*) calloc (1, sizeof (struct list_node));
     if (new_node == NULL)
         return NULL;
