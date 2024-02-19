@@ -2,6 +2,7 @@
 
 const size_t TEST_ELEM_NUMBER = 1000000;
 const size_t ARRAY_STACK_INITIAL_CAPACITY = 4;
+const double MSEC_IN_SEC = 1000.0;
 
 const size_t TEST1_ITERATION_NUMBER = 9;
 const size_t TEST1_ITERATION_MULTIPLIER = 2;
@@ -12,6 +13,10 @@ const size_t TEST2_FLEXIBLE_ELEM_NUMBER = 10000;
 const size_t TEST3_ITERATION_NUMBER = 1000000;
 const size_t TEST3_PUSH = 1;
 const size_t TEST3_POP  = 2;
+
+static double
+ClocksToMs (const clock_t time_begin,
+            const clock_t time_end);
 
 static int
 LittleRandom (void);
@@ -95,8 +100,8 @@ void Test1 (void)
 
     clock_t list_stack_end = clock ();
 
-    printf ("%ld %ld\n", array_stack_end - array_stack_begin,
-                         list_stack_end  - list_stack_begin);
+    printf ("%lg %lg\n", ClocksToMs (array_stack_begin, array_stack_end),
+                         ClocksToMs (list_stack_begin,  list_stack_end));
 
     StackDestructor (array_stk);
     ListStackDestructor (list_stk);
@@ -209,8 +214,8 @@ void Test2 (void)
 
     clock_t list_stack_end = clock ();
 
-    printf ("%ld %ld\n", array_stack_end - array_stack_begin,
-                         list_stack_end  - list_stack_begin);
+    printf ("%lg %lg\n", ClocksToMs (array_stack_begin, array_stack_end),
+                         ClocksToMs (list_stack_begin,  list_stack_end));
 
     StackDestructor (array_stk);
     ListStackDestructor (list_stk);
@@ -286,11 +291,18 @@ void Test3 (void)
 
     clock_t list_stack_end = clock ();
 
-    printf ("%ld %ld\n", array_stack_end - array_stack_begin,
-                         list_stack_end  - list_stack_begin);
+    printf ("%lg %lg\n", ClocksToMs (array_stack_begin, array_stack_end),
+                         ClocksToMs (list_stack_begin,  list_stack_end));
 
     StackDestructor (array_stk);
     ListStackDestructor (list_stk);
+}
+
+static double
+ClocksToMs (const clock_t time_begin,
+            const clock_t time_end)
+{
+    return MSEC_IN_SEC * (time_end - time_begin) / CLOCKS_PER_SEC;
 }
 
 static int

@@ -26,7 +26,7 @@ StackConstructor (const size_t stack_initial_capacity,
     stk -> elem_size           = stack_elem_size;
 
     if (StackRealloc (stk) == ERROR_OCCURED)
-        return ERROR_OCCURED;
+        return NULL;
 
     return stk;
 }
