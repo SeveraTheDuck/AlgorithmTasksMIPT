@@ -1,6 +1,10 @@
 #include "../include/quadratic.h"
 #include <stdio.h>
 
+const size_t SHELL_SORT_KNUT_INIT_STEP       = 1;
+const size_t SHELL_SORT_KNUT_STEP_MULTIPLIER = 3;
+const size_t SHELL_SORT_KNUT_ADDITIVE        = 1;
+
 static void int_swap (int* first, int* second)
 {
     assert (first);
@@ -73,6 +77,40 @@ SelectionSort (int* const   array,
                 min_index = j;
 
             int_swap (&array[i], &array[min_index]);
+        }
+    }
+}
+
+void
+ShellSort (int* const   array,
+           const size_t elem_number)
+{
+    if (array == NULL) return;
+
+    size_t step = SHELL_SORT_KNUT_INIT_STEP;
+    size_t step_max = elem_number / (SHELL_SORT_KNUT_STEP_MULTIPLIER *
+                                     SHELL_SORT_KNUT_STEP_MULTIPLIER);
+
+    while (step <= step_max)
+    {
+        step = step * SHELL_SORT_KNUT_STEP_MULTIPLIER + SHELL_SORT_KNUT_ADDITIVE;
+    }
+
+    int temp_value = 0;
+
+    for (; step > 0; step /= SHELL_SORT_KNUT_STEP_MULTIPLIER)
+    {
+        for (size_t i = step; i < elem_number; i += step)
+        {
+            size_t j = i;
+            temp_value = array[i];
+
+            for (; j >= step && array[j - step] > temp_value; j -= step)
+            {
+                array[j] = array[j - step];
+            }
+
+            array[j] = temp_value;
         }
     }
 }
