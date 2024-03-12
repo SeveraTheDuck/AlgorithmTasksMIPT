@@ -104,6 +104,6 @@ static size_t
 SizeMin (const size_t elem1,
          const size_t elem2)
 {
-    if (elem1 >= elem2) return elem1;
+    if (elem1 <= elem2) return elem1;
     else return elem2; 
 }
