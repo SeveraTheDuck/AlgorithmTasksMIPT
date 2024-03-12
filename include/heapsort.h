@@ -2,6 +2,7 @@
 #define HEAP_SORT_H
 
 #include "../lib/include/k_heap.h"
+#include <limits.h>
 
 enum int_compare
 {

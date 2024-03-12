@@ -163,8 +163,6 @@ KHeapExtractRoot (struct k_heap* const heap,
     void* const last_ptr = KHeapGetElemPtrByIndex
         (heap, heap->d_array->data_array_size - 1);
 
-    // fprintf (stderr, "LAST_PTR %d\n", *(int*)last_ptr);
-
     if (root_ptr == NULL || last_ptr == NULL) return K_HEAP_ERROR;
 
     if (get_buffer != NULL)

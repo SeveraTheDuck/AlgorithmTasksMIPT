@@ -3,6 +3,10 @@
 
 #include "dynamic_array.h"
 
+extern const size_t K_HEAP_NULL_SIZE;
+extern const size_t K_HEAP_ROOT_INDEX;
+extern const size_t K_HEAP_INITIAL_DATA_ARRAY_CAPACITY;
+
 enum k_heap_error_status
 {
     K_HEAP_SUCCESS = 0,

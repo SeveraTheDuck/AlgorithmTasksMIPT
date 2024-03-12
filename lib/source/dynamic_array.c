@@ -4,6 +4,11 @@ const size_t DYNAMIC_ARRAY_RESIZE_MULTIPLIER = 2;
 const size_t DYNAMIC_ARRAY_NULL_SIZE   = 0;
 const char   DYNAMIC_ARRAY_POISON_BYTE = 0;
 
+/**
+ * @brief Checks whether the struct pointers are OK.
+ * @param d_array Pointer to struct.
+ * @return Error status.
+ */
 static dynamic_array_error_t
 DynamicArrayCheck (struct dynamic_array* const d_array);
 
@@ -47,7 +52,8 @@ DynamicArrayDestructor (struct dynamic_array* const d_array)
     if (d_array == NULL) return NULL;
 
     /* destroy data_array */
-    if (d_array->data_array != NULL && d_array->save_array == false)
+    if (d_array->data_array != NULL &&
+        d_array->save_array == DYNAMIC_ARRAY_DESTROY)
     {
         for (size_t i = 0; i < d_array->data_array_capacity; ++i)
         {
@@ -74,6 +80,7 @@ DynamicArrayReallocCheck (struct dynamic_array* const d_array)
     if (d_array->enable_realloc == DYNAMIC_ARRAY_REALLOC_DISABLED)
         return DYNAMIC_ARRAY_SUCCESS;
 
+    /* realloc up */
     if (d_array->data_array_size == d_array->data_array_capacity)
     {
         d_array->data_array_capacity *= DYNAMIC_ARRAY_RESIZE_MULTIPLIER;
@@ -82,6 +89,7 @@ DynamicArrayReallocCheck (struct dynamic_array* const d_array)
             return DYNAMIC_ARRAY_ERROR;
     }
 
+    /* realloc down */
     else if (d_array->data_array_size <=
              d_array->data_array_capacity / DYNAMIC_ARRAY_RESIZE_MULTIPLIER /
                                             DYNAMIC_ARRAY_RESIZE_MULTIPLIER)
