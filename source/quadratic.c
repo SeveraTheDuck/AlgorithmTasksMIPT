@@ -25,9 +25,9 @@ BubbleSort (int* const   array,
 
         for (size_t j = 0; j < elem_number - i; ++j)
         {
-            if (array [j - 1] > array [j])
+            if (array[j - 1] > array[j])
             {
-                int_swap (&array [j - 1], &array [j]);
+                int_swap (&array[j - 1], &array[j]);
                 ++num_of_swaps;
             }
         }
@@ -44,13 +44,35 @@ InsertionSort (int* const   array,
 
     for (size_t i = 1; i < elem_number; ++i)
     {
-        /* reverse loop does j-- before loop body, so j = i, not j - 1 */
+        /* reverse loop does j-- before loop body, so j = i, not i - 1 */
         for (size_t j = i; j-- > 0;)
         {
             if (array[j] > array[j + 1])
                 int_swap (&array[j], &array[j + 1]);
 
             else break;
+        }
+    }
+}
+
+void
+SelectionSort (int* const   array,
+               const size_t elem_number)
+{
+    if (array == NULL) return;
+
+    size_t min_index = 0;
+
+    for (size_t i = 0; i < elem_number - 1; ++i)
+    {
+        min_index = i;
+
+        for (size_t j = i + 1; j < elem_number; ++j)
+        {
+            if (array[j] < array[min_index])
+                min_index = j;
+
+            int_swap (&array[i], &array[min_index]);
         }
     }
 }

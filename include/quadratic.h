@@ -12,4 +12,8 @@ void
 InsertionSort (int* const   array,
                const size_t elem_number);
 
+void
+SelectionSort (int* const   array,
+               const size_t elem_number);
+
 #endif /* QUADRATIC_H */
