@@ -1,5 +1,5 @@
 #include "../include/qsort.h"
-#include <stdio.h> //DEBUG
+
 static void
 QuickSort (int* const   array,
            const size_t left_index,
@@ -31,6 +31,14 @@ ThickPartition (int* const   array,
                 size_t* const equals_to);
 
 static void
+QsortLessRecursion (int* const   array,
+                    size_t left_index,
+                    size_t right_index,
+                    size_t (*partition) (int* const   array,
+                                         const size_t left_index,
+                                         const size_t right_index));
+
+static void
 int_swap (int* first, int* second);
 
 void
@@ -58,6 +66,15 @@ QuickThickSort (int* const   array,
     if (array == NULL) return;
 
     QsortRecursionThickPartition (array, 0, elem_number - 1);
+}
+
+void
+QuickOneRecursionBranchSort (int* const   array,
+                             const size_t elem_number)
+{
+    if (array == NULL) return;
+
+    QsortLessRecursion (array, 0, elem_number - 1, HoarePartition);
 }
 
 static void
@@ -179,6 +196,38 @@ ThickPartition (int* const   array,
 
     *equals_from = left_index;
     *equals_to   = right_index;
+}
+
+static void
+QsortLessRecursion (int* const   array,
+                    size_t left_index,
+                    size_t right_index,
+                    size_t (*partition) (int* const   array,
+                                         const size_t left_index,
+                                         const size_t right_index))
+{
+    assert (array);
+
+    size_t pivot_index = 0;
+    size_t mid_index   = 0;
+
+    while (left_index < right_index)
+    {
+        pivot_index = partition (array, left_index, right_index); 
+        mid_index   = left_index + (right_index - left_index) / 2;
+
+        if (pivot_index > mid_index)
+        {
+            QsortLessRecursion (array, pivot_index + 1, right_index, partition);
+            right_index = pivot_index;
+        }
+
+        else
+        {
+            QsortLessRecursion (array, left_index, pivot_index, partition);
+            left_index = pivot_index + 1;
+        }
+    }
 }
 
 static void

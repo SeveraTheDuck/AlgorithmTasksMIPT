@@ -16,4 +16,8 @@ void
 QuickThickSort (int* const   array,
                 const size_t elem_number);
 
+void
+QuickOneRecursionBranchSort (int* const   array,
+                             const size_t elem_number);
+
 #endif /* QSORT_H */

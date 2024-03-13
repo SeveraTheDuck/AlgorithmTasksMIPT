@@ -1,7 +1,6 @@
 #ifndef MERGE_SORT_H
 #define MERGE_SORT_H
 
-#include <stdio.h> //DEBUG
 #include <stdlib.h>
 #include <stdbool.h>
 #include <assert.h>
