@@ -13,17 +13,16 @@ const char   DYNAMIC_ARRAY_POISON_BYTE = 0;
 const size_t STACK_NULL_SIZE = 0;
 const size_t STACK_INITIAL_CAPACITY = 10;
 
-// ask on code-review about const and sizes in const arrays
 #define ENTER_STRING_MAX_LEN 6 
-const char PUSH_STR  [] = "push\0";
-const char POP_STR   [] = "pop\0";
-const char BACK_STR  [] = "back\0";
-const char SIZE_STR  [] = "size\0";
-const char CLEAR_STR [] = "clear\0";
-const char EXIT_STR  [] = "exit\0";
-const char ERROR_STR [] = "error\0";
-const char OK_STR    [] = "ok\0";
-const char BYE_STR   [] = "bye\0";
+const char PUSH_STR  [] = "push";
+const char POP_STR   [] = "pop";
+const char BACK_STR  [] = "back";
+const char SIZE_STR  [] = "size";
+const char CLEAR_STR [] = "clear";
+const char EXIT_STR  [] = "exit";
+const char ERROR_STR [] = "error";
+const char OK_STR    [] = "ok";
+const char BYE_STR   [] = "bye";
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 
@@ -32,6 +31,23 @@ const char BYE_STR   [] = "bye\0";
 //-----------------------------------------------------------------------------
 // structs and types
 //-----------------------------------------------------------------------------
+enum function_flags
+{
+    BAD_INPUT_FUNCTION_FLAG = 0,
+    PUSH_FUNCTION_FLAG      = 1,
+    POP_FUNCTION_FLAG       = 2,
+    BACK_FUNCTION_FLAG      = 3,
+    SIZE_FUNCTION_FLAG      = 4,
+    CLEAR_FUNCTION_FLAG     = 5,
+    EXIT_FUNCTION_FLAG      = 6
+};
+
+enum task_status
+{
+    TASK_ERROR   = 0,
+    TASK_SUCCESS = 1
+};
+
 enum dynamic_array_error_status
 {
     DYNAMIC_ARRAY_SUCCESS = 0,
@@ -44,8 +60,10 @@ enum stack_error_status
     STACK_ERROR   = 1
 };
 
-typedef int dynamic_array_error_t;
-typedef int stack_error_t;
+typedef size_t function_flag_t;
+typedef int    task_status_t;
+typedef int    dynamic_array_error_t;
+typedef int    stack_error_t;
 
 struct dynamic_array 
 {
@@ -410,17 +428,19 @@ StackCheck (const struct stack* const stk)
 //-----------------------------------------------------------------------------
 // Main functions
 //-----------------------------------------------------------------------------
+function_flag_t
+GetFunctionFlag (const char* const input_str);
+
 void
 PushFunction (struct stack* const stk);
 
-void
-PopFunction (struct stack* const stk);
+task_status_t
+PopFunction (struct stack* const stk,
+             long long*    const pop_value);
 
-void
-BackFunction (struct stack* const stk);
-
-void
-BackFunction (struct stack* const stk);
+task_status_t
+BackFunction (struct stack* const stk,
+              long long*    const pop_value);
 
 void
 ClearFunction (struct stack* const stk);
@@ -435,32 +455,78 @@ int main ()
         StackConstructor (STACK_INITIAL_CAPACITY, sizeof (long long));
     assert (stk);
 
-    while (scanf ("%6s", input_str) == 1)
+    function_flag_t function_flag = 0;
+    task_status_t   task_status   = 0;
+
+    long long pop_ret_value = 0;
+
+    while (scanf ("%5s", input_str) == 1)
     {
-        if      (strcmp (PUSH_STR,  input_str) == 0) PushFunction  (stk);
+        function_flag = GetFunctionFlag (input_str);
 
-        else if (strcmp (POP_STR,   input_str) == 0) PopFunction   (stk);
-
-        else if (strcmp (BACK_STR,  input_str) == 0) BackFunction  (stk);
-
-        else if (strcmp (SIZE_STR,  input_str) == 0)
-            printf ("%zd\n", stk -> d_array -> data_array_size);
-
-        else if (strcmp (CLEAR_STR, input_str) == 0) ClearFunction (stk);
-
-        else if (strcmp (EXIT_STR,  input_str) == 0)
+        switch (function_flag)
         {
-            printf ("%s\n", BYE_STR);
-            break;
-        }
+            case PUSH_FUNCTION_FLAG:
+                PushFunction (stk);
+                printf ("%s\n", OK_STR);
+                break;
+            
+            case POP_FUNCTION_FLAG:
+                task_status = PopFunction (stk, &pop_ret_value);
+                if (task_status == TASK_SUCCESS)
+                    printf ("%lld\n", pop_ret_value);
+                else printf ("%s\n", ERROR_STR);
+                break;
 
-        else assert (0);
+            case BACK_FUNCTION_FLAG:
+                task_status = BackFunction (stk, &pop_ret_value);
+                if (task_status == TASK_SUCCESS)
+                    printf ("%lld\n", pop_ret_value);
+                else printf ("%s\n", ERROR_STR);
+                break;
+
+            case SIZE_FUNCTION_FLAG:
+                printf ("%zd\n", stk -> d_array -> data_array_size);
+                break;
+
+            case CLEAR_FUNCTION_FLAG:
+                ClearFunction (stk);
+                printf ("%s\n", OK_STR);
+                break;
+
+            case EXIT_FUNCTION_FLAG:
+                printf ("%s\n", BYE_STR);
+                free (input_str);
+                stk = StackDestructor (stk);
+                return 0;
+
+            default:
+                assert (BAD_INPUT_FUNCTION_FLAG);
+                break;
+        }
     }
 
-    free (input_str);
-    stk = StackDestructor (stk);
-
     return 0;
+}
+
+function_flag_t
+GetFunctionFlag (const char* const input_str)
+{
+    assert (input_str);
+
+    if (strcmp (PUSH_STR,  input_str) == 0) return PUSH_FUNCTION_FLAG;
+
+    if (strcmp (POP_STR,   input_str) == 0) return POP_FUNCTION_FLAG;
+
+    if (strcmp (BACK_STR,  input_str) == 0) return BACK_FUNCTION_FLAG;
+
+    if (strcmp (SIZE_STR,  input_str) == 0) return SIZE_FUNCTION_FLAG;
+
+    if (strcmp (CLEAR_STR, input_str) == 0) return CLEAR_FUNCTION_FLAG;
+
+    if (strcmp (EXIT_STR,  input_str) == 0) return EXIT_FUNCTION_FLAG;
+
+    return BAD_INPUT_FUNCTION_FLAG;
 }
 
 void
@@ -473,43 +539,38 @@ PushFunction (struct stack* const stk)
 
     StackPush (stk, &push_value);
 
-    printf ("%s\n", OK_STR);
+    return;
 }
 
-void
-PopFunction (struct stack* const stk)
+task_status_t
+PopFunction (struct stack* const stk,
+             long long*    const pop_value)
 {
     assert (stk);
+    assert (pop_value);
 
     if (stk -> d_array -> data_array_size == DYNAMIC_ARRAY_NULL_SIZE)
-    {
-        printf ("%s\n", ERROR_STR);
-        return;
-    }
+        return TASK_ERROR;
 
-    long long pop_value = 0;
-    StackTop (stk, &pop_value);
+    StackTop (stk, pop_value);
     StackPop (stk);
 
-    printf ("%lld\n", pop_value);
-
+    return TASK_SUCCESS;
 }
 
-void
-BackFunction (struct stack* const stk)
+task_status_t
+BackFunction (struct stack* const stk,
+              long long*    const pop_value)
 {
     assert (stk);
+    assert (pop_value);
 
     if (stk -> d_array -> data_array_size == DYNAMIC_ARRAY_NULL_SIZE)
-    {
-        printf ("%s\n", ERROR_STR);
-        return;
-    }
+        return TASK_ERROR;
 
-    long long back_value = 0;
-    StackTop (stk, &back_value);
+    StackTop (stk, pop_value);
 
-    printf ("%lld\n", back_value);
+    return TASK_SUCCESS;
 }
 
 void
@@ -521,7 +582,7 @@ ClearFunction (struct stack* const stk)
 
     for (size_t i = 0; i < stk_size; ++i) StackPop (stk);
 
-    printf ("%s\n", OK_STR);
+    return;
 }
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
