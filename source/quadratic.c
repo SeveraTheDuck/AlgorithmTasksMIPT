@@ -27,7 +27,7 @@ BubbleSort (int* const   array,
     {
         num_of_swaps = 0;
 
-        for (size_t j = 0; j < elem_number - i; ++j)
+        for (size_t j = 1; j < elem_number - i; ++j)
         {
             if (array[j - 1] > array[j])
             {
@@ -75,9 +75,10 @@ SelectionSort (int* const   array,
         {
             if (array[j] < array[min_index])
                 min_index = j;
-
-            int_swap (&array[i], &array[min_index]);
         }
+
+        if (min_index != i)
+            int_swap (&array[i], &array[min_index]);
     }
 }
 

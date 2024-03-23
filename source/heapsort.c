@@ -3,7 +3,7 @@
 /**
  * @brief Makes heap out of given array.
  * @details Function is needed because k_heap struct uses dynamic_array
- * struct, and initialisations become quite big. 
+ * struct, and initialisations become quite big.
  * @warning The dynamic_array struct includes DYNAMIC_ARRAY_REALLOC_DISABLED
  * and DYNAMIC_ARRAY_SAVE fields to make heap usage easy.
  * @param array Pointer to array to make heap from.
@@ -24,7 +24,7 @@ HeapSort (int* const   array,
           const size_t elem_number,
           const size_t heap_k_value)
 {
-    assert (array);
+    if (array == NULL) return;
 
     struct k_heap* const heap =
         HeapSortInitHeap (array, elem_number, heap_k_value);
@@ -84,4 +84,67 @@ static int int_cmp (void* elem1,
 
     if (*(int*)elem1 >= *(int*)elem2) return GREATER;
     return LESS;
+}
+
+void
+TwoHeapSort (int* const array,
+             const size_t elem_number)
+{
+    HeapSort (array, elem_number, 2);
+}
+
+void
+ThreeHeapSort (int* const array,
+             const size_t elem_number)
+{
+    HeapSort (array, elem_number, 3);
+}
+
+void
+FourHeapSort (int* const array,
+             const size_t elem_number)
+{
+    HeapSort (array, elem_number, 4);
+}
+
+void
+FiveHeapSort (int* const array,
+             const size_t elem_number)
+{
+    HeapSort (array, elem_number, 5);
+}
+
+void
+SixHeapSort (int* const array,
+             const size_t elem_number)
+{
+    HeapSort (array, elem_number, 6);
+}
+
+void
+SevenHeapSort (int* const array,
+             const size_t elem_number)
+{
+    HeapSort (array, elem_number, 7);
+}
+
+void
+EightHeapSort (int* const array,
+             const size_t elem_number)
+{
+    HeapSort (array, elem_number, 8);
+}
+
+void
+NineHeapSort (int* const array,
+             const size_t elem_number)
+{
+    HeapSort (array, elem_number, 9);
+}
+
+void
+TenHeapSort (int* const array,
+             const size_t elem_number)
+{
+    HeapSort (array, elem_number, 10);
 }

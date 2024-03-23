@@ -98,9 +98,9 @@ LomutoPartition (int* const   array,
 
     int_swap (&array[right_index], &array[pivot]);
 
-    for (size_t j = left_index; j <= right_index; ++j)
+    for (size_t j = left_index; j < right_index; ++j)
     {
-        if (array[j] < pivot_elem)
+        if (array[j] <= pivot_elem)
             int_swap (&array[i++], &array[j]);
     }
 
@@ -203,7 +203,7 @@ int_swap (int* first, int* second)
     assert (first);
     assert (second);
 
-    *first  = *first ^ *second;
-    *second = *first ^ *second;
-    *first  = *first ^ *second;
+    int temp_value = *second;
+    *second = *first;
+    *first  = temp_value;
 }

@@ -24,4 +24,40 @@ HeapSort (int* const   array,
           const size_t elem_number,
           const size_t heap_k_value);
 
+void
+TwoHeapSort (int* const array,
+             const size_t elem_number);
+
+void
+ThreeHeapSort (int* const array,
+             const size_t elem_number);
+
+void
+FourHeapSort (int* const array,
+             const size_t elem_number);
+
+void
+FiveHeapSort (int* const array,
+             const size_t elem_number);
+
+void
+SixHeapSort (int* const array,
+             const size_t elem_number);
+
+void
+SevenHeapSort (int* const array,
+             const size_t elem_number);
+
+void
+EightHeapSort (int* const array,
+             const size_t elem_number);
+
+void
+NineHeapSort (int* const array,
+             const size_t elem_number);
+
+void
+TenHeapSort (int* const array,
+             const size_t elem_number);
+
 #endif

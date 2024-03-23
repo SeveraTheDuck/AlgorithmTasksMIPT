@@ -19,7 +19,7 @@ int main (const int argc, const char** const argv)
     // read elem_number
     const size_t elem_number =
         (size_t) atoll (argv[ELEM_NUMBER_ARG_INDEX]);
-    assert (elem_number > 0);
+    assert (elem_number >= 0);
 
     const int max_value = atoi (argv[MAX_POSSIBLE_VALUE_INDEX]);
 

@@ -65,14 +65,14 @@ max_elem_value=$6
 #------------------------------------------------------------------------------
 # Generate tests
 #------------------------------------------------------------------------------
-for (( cur_size =$from; cur_size < $to; cur_size += $step))
+for (( cur_size=$from; cur_size <= $to; cur_size += $step))
 do
     for (( cur_test=0; cur_test < $max_test_number; ++cur_test))
     do
-        touch "$cur_tests_dir/{$cur_size}_{$cur_test}.in"
-        touch "$cur_tests_dir/{$cur_size}_{$cur_test}.out"
-        $gen_test_exe $cur_size $max_elem_value >> "$cur_tests_dir/{$cur_size}_{$cur_test}.in"
-        $gen_answ_exe < "$cur_tests_dir/{$cur_size}_{$cur_test}.in" >> "$cur_tests_dir/{$cur_size}_{$cur_test}.out"
+        touch "$cur_tests_dir/$cur_size""_$cur_test.in"
+        touch "$cur_tests_dir/$cur_size""_$cur_test.out"
+        $gen_test_exe $cur_size $max_elem_value >> "$cur_tests_dir/$cur_size""_$cur_test.in"
+        $gen_answ_exe < "$cur_tests_dir/$cur_size""_$cur_test.in" >> "$cur_tests_dir/$cur_size""_$cur_test.out"
     done
 done
 #------------------------------------------------------------------------------
