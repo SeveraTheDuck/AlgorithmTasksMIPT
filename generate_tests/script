@@ -4,16 +4,17 @@
 # Consts
 #------------------------------------------------------------------------------
 # tests generator executable
-gen_test_exe=./gen_test
+gen_test_exe=gen_test.exe
 
 # tests answers generator executable
-gen_answ_exe=./gen_answer
+gen_answ_exe=gen_answer.exe
 
 # main tests directory name
 tests_dir=./tests
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
 
+echo $@
 
 
 #------------------------------------------------------------------------------
@@ -71,8 +72,8 @@ do
     do
         touch "$cur_tests_dir/$cur_size""_$cur_test.in"
         touch "$cur_tests_dir/$cur_size""_$cur_test.out"
-        $gen_test_exe $cur_size $max_elem_value >> "$cur_tests_dir/$cur_size""_$cur_test.in"
-        $gen_answ_exe < "$cur_tests_dir/$cur_size""_$cur_test.in" >> "$cur_tests_dir/$cur_size""_$cur_test.out"
+        ./$gen_test_exe $cur_size $max_elem_value >> "$cur_tests_dir/$cur_size""_$cur_test.in"
+        ./$gen_answ_exe < "$cur_tests_dir/$cur_size""_$cur_test.in" >> "$cur_tests_dir/$cur_size""_$cur_test.out"
     done
 done
 #------------------------------------------------------------------------------

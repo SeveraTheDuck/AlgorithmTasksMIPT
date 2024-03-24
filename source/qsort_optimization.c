@@ -34,9 +34,6 @@ MedianRandom3Pivot (int* const   array,
 static int
 ThreeElementsMedian (int elem1, int elem2, int elem3);
 
-static void
-int_swap (int* first, int* second);
-
 void
 QuickOneRecursionBranchSort (int* const   array,
                              const size_t elem_number)
@@ -173,15 +170,4 @@ ThreeElementsMedian (int elem1, int elem2, int elem3)
     if (elem2 > elem3) int_swap (&elem2, &elem3);
 
     return elem2;
-}
-
-static void
-int_swap (int* first, int* second)
-{
-    assert (first);
-    assert (second);
-
-    *first  = *first ^ *second;
-    *second = *first ^ *second;
-    *first  = *first ^ *second;
 }

@@ -16,9 +16,6 @@ HeapSortInitHeap (int* const array,
                   const size_t elem_number,
                   const size_t heap_k_value);
 
-static int int_cmp (void* elem1,
-                    void* elem2);
-
 void
 HeapSort (int* const   array,
           const size_t elem_number,
@@ -74,77 +71,4 @@ HeapSortInitHeap (int* const array,
         DynamicArrayDestructor (d_array);
 
     return heap;
-}
-
-static int int_cmp (void* elem1,
-                    void* elem2)
-{
-    assert (elem1);
-    assert (elem2);
-
-    if (*(int*)elem1 >= *(int*)elem2) return GREATER;
-    return LESS;
-}
-
-void
-TwoHeapSort (int* const array,
-             const size_t elem_number)
-{
-    HeapSort (array, elem_number, 2);
-}
-
-void
-ThreeHeapSort (int* const array,
-             const size_t elem_number)
-{
-    HeapSort (array, elem_number, 3);
-}
-
-void
-FourHeapSort (int* const array,
-             const size_t elem_number)
-{
-    HeapSort (array, elem_number, 4);
-}
-
-void
-FiveHeapSort (int* const array,
-             const size_t elem_number)
-{
-    HeapSort (array, elem_number, 5);
-}
-
-void
-SixHeapSort (int* const array,
-             const size_t elem_number)
-{
-    HeapSort (array, elem_number, 6);
-}
-
-void
-SevenHeapSort (int* const array,
-             const size_t elem_number)
-{
-    HeapSort (array, elem_number, 7);
-}
-
-void
-EightHeapSort (int* const array,
-             const size_t elem_number)
-{
-    HeapSort (array, elem_number, 8);
-}
-
-void
-NineHeapSort (int* const array,
-             const size_t elem_number)
-{
-    HeapSort (array, elem_number, 9);
-}
-
-void
-TenHeapSort (int* const array,
-             const size_t elem_number)
-{
-    HeapSort (array, elem_number, 10);
 }

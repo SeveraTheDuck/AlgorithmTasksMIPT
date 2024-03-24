@@ -31,12 +31,8 @@ ThickPartition (int* const   array,
                 size_t* const equals_to);
 
 static size_t
-MiddlePivot (int* const   array,
-             const size_t left_index,
+MiddlePivot (const size_t left_index,
              const size_t right_index);
-
-static void
-int_swap (int* first, int* second);
 
 void
 QuickLomutoSort (int* const   array,
@@ -91,16 +87,16 @@ LomutoPartition (int* const   array,
     assert (array);
     assert (left_index < right_index);
 
-    size_t pivot = MiddlePivot (array, left_index, right_index);
+    size_t pivot = MiddlePivot (left_index, right_index);
     size_t i = left_index;
 
     int pivot_elem = array[pivot];
 
     int_swap (&array[right_index], &array[pivot]);
 
-    for (size_t j = left_index; j < right_index; ++j)
+    for (size_t j = left_index; j <= right_index; ++j)
     {
-        if (array[j] <= pivot_elem)
+        if (array[j] < pivot_elem)
             int_swap (&array[i++], &array[j]);
     }
 
@@ -117,7 +113,7 @@ HoarePartition (int* const   array,
     assert (array);
     assert (left_index < right_index);
 
-    size_t pivot = MiddlePivot (array, left_index, right_index);
+    size_t pivot = MiddlePivot (left_index, right_index);
     int pivot_elem = array[pivot];
 
     size_t i = left_index;
@@ -165,7 +161,7 @@ ThickPartition (int* const   array,
     assert (equals_from);
     assert (equals_to);
 
-    size_t pivot = MiddlePivot (array, left_index, right_index);
+    size_t pivot = MiddlePivot (left_index, right_index);
     int pivot_elem = array[pivot];
 
     size_t mid_index = left_index;
@@ -187,23 +183,10 @@ ThickPartition (int* const   array,
 }
 
 static size_t
-MiddlePivot (int* const   array,
-             const size_t left_index,
+MiddlePivot (const size_t left_index,
              const size_t right_index)
 {
-    assert (array);
     assert (left_index < right_index);
 
     return left_index + (right_index - left_index) / 2;
-}
-
-static void
-int_swap (int* first, int* second)
-{
-    assert (first);
-    assert (second);
-
-    int temp_value = *second;
-    *second = *first;
-    *first  = temp_value;
 }

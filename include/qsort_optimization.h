@@ -2,6 +2,7 @@
 #define QSORT_OPTIMIZATION_H
 
 #include "qsort.h"
+#include "common.h"
 
 void
 QuickOneRecursionBranchSort (int* const   array,

@@ -37,5 +37,6 @@ int main ()
     for (size_t i = 0; i < elem_number; ++i)
         printf ("%d\n", array[i]);
 
+    free (array);
     return 0;
 }

@@ -3,12 +3,7 @@
 
 #include "../lib/include/k_heap.h"
 #include <limits.h>
-
-enum int_compare
-{
-    LESS    = -1,
-    GREATER =  1
-};
+#include "common.h"
 
 enum heap_k_value
 {
@@ -23,41 +18,5 @@ void
 HeapSort (int* const   array,
           const size_t elem_number,
           const size_t heap_k_value);
-
-void
-TwoHeapSort (int* const array,
-             const size_t elem_number);
-
-void
-ThreeHeapSort (int* const array,
-             const size_t elem_number);
-
-void
-FourHeapSort (int* const array,
-             const size_t elem_number);
-
-void
-FiveHeapSort (int* const array,
-             const size_t elem_number);
-
-void
-SixHeapSort (int* const array,
-             const size_t elem_number);
-
-void
-SevenHeapSort (int* const array,
-             const size_t elem_number);
-
-void
-EightHeapSort (int* const array,
-             const size_t elem_number);
-
-void
-NineHeapSort (int* const array,
-             const size_t elem_number);
-
-void
-TenHeapSort (int* const array,
-             const size_t elem_number);
 
 #endif
