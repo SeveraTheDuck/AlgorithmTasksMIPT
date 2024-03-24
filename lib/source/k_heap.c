@@ -8,6 +8,10 @@ const size_t K_HEAP_INITIAL_DATA_ARRAY_CAPACITY = 4;
 static void
 swap (void* elem1, void* elem2, const size_t elem_size);
 
+static inline void*
+KHeapGetElemPtrByIndex (struct k_heap* const heap,
+                        const size_t key_index);
+
 struct k_heap*
 KHeapConstructor (struct dynamic_array* d_array,
                   const  size_t k,
@@ -199,7 +203,7 @@ KHeapDeleteKey (struct k_heap* const heap,
     return K_HEAP_SUCCESS;
 }
 
-void*
+static inline void*
 KHeapGetElemPtrByIndex (struct k_heap* const heap,
                         const size_t key_index)
 {

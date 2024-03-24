@@ -53,8 +53,4 @@ k_heap_error_t
 KHeapDeleteKey (struct k_heap* const heap,
                 const size_t key_index);
 
-void*
-KHeapGetElemPtrByIndex (struct k_heap* const heap,
-                        const size_t key_index);
-
 #endif /* K_HEAP_H */

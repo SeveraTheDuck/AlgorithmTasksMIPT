@@ -9,7 +9,7 @@ const char   DYNAMIC_ARRAY_POISON_BYTE = 0;
  * @param d_array Pointer to struct.
  * @return Error status.
  */
-static dynamic_array_error_t
+static inline dynamic_array_error_t
 DynamicArrayCheck (struct dynamic_array* const d_array);
 
 struct dynamic_array*
@@ -188,7 +188,7 @@ DynamicArrayGetElemPtrByIndex (struct dynamic_array* const d_array,
                             d_array->elem_size * elem_index);
 }
 
-static dynamic_array_error_t
+static inline dynamic_array_error_t
 DynamicArrayCheck (struct dynamic_array* const d_array)
 {
     if (d_array == NULL || d_array->data_array == NULL)
