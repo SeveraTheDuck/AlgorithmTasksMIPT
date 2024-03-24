@@ -3,6 +3,7 @@
 
 #include <stdlib.h>
 #include <assert.h>
+#include "common.h"
 
 void
 BubbleSort (int* const   array,

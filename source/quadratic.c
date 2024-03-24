@@ -5,16 +5,6 @@ const size_t SHELL_SORT_KNUT_INIT_STEP       = 1;
 const size_t SHELL_SORT_KNUT_STEP_MULTIPLIER = 3;
 const size_t SHELL_SORT_KNUT_ADDITIVE        = 1;
 
-static void int_swap (int* first, int* second)
-{
-    assert (first);
-    assert (second);
-
-    int temp_second = *second;
-    *second = *first;
-    *first = temp_second;
-}
-
 void
 BubbleSort (int* const   array,
             const size_t elem_number)

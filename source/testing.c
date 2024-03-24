@@ -79,7 +79,6 @@ TestSort (const char*  const test_folder,
 
             EndCurrentTest (array, files, file_input);
         }
-
     }
 
     names      = FileNamesDestructor    (names);
