@@ -10,8 +10,9 @@ ReadTestFiles (struct file_names*     const names,
 static char*
 ReadFileToBuffer (FILE* const file);
 
-static int*
-FillArray (struct file_input_str* const file_input,
+void
+FillArray (int* const array,
+           struct file_input_str* const file_input,
            size_t* const elem_number);
 
 static void
@@ -27,8 +28,7 @@ SetTestNames (struct file_names* const names,
               const size_t cur_test_num);
 
 static void
-EndCurrentTest (int* const array,
-                struct file_ptrs* const files,
+EndCurrentTest (struct file_ptrs* const files,
                 struct file_input_str* const file_input);
 
 void
@@ -56,7 +56,9 @@ TestSort (const char*  const test_folder,
         FileInputConstructor ();
     assert (file_input);
 
-    int* array = NULL;
+    int* const array = (int* const) calloc (to, sizeof (int));
+    assert (array);
+
     size_t elem_number = 0;
     clock_t sort_begin = 0;
     clock_t sort_end   = 0;
@@ -70,7 +72,7 @@ TestSort (const char*  const test_folder,
         {
             SetTestNames  (names, cur_size, cur_test);
             ReadTestFiles (names, files, file_input);
-            array = FillArray (file_input, &elem_number);
+            FillArray (array, file_input, &elem_number);
 
             sort_begin = clock ();
             sort (array, elem_number);
@@ -81,13 +83,14 @@ TestSort (const char*  const test_folder,
             fprintf (files->output, "%zd %zd\n", cur_size, sort_end - sort_begin);
             fprintf (stderr, "Test %zd of %zd\n", cur_test_cnt++, total_test_number);
 
-            EndCurrentTest (array, files, file_input);
+            EndCurrentTest (files, file_input);
         }
     }
 
     names      = FileNamesDestructor    (names);
     files      = FilePointersDestructor (files);
     file_input = FileInputDestructor    (file_input);
+    free (array);
 }
 
 struct file_names*
@@ -189,22 +192,20 @@ ReadFileToBuffer (FILE* const file)
     return buffer;
 }
 
-static int*
-FillArray (struct file_input_str* const file_input,
+void
+FillArray (int* const array,
+           struct file_input_str* const file_input,
            size_t* const elem_number)
 {
-    assert (elem_number);
+    assert (array);
     assert (file_input);
+    assert (elem_number);
 
     int scanned_symbols = 0;
 
     sscanf (file_input->test, "%zd %n", elem_number, &scanned_symbols);
     file_input->test_str_index += scanned_symbols;
-    if (*elem_number == 0) return NULL;
-
-    int* const array =
-        (int* const) calloc (*elem_number, sizeof (int));
-    assert (array);
+    if (*elem_number == 0) return;
 
     for (size_t i = 0; i < *elem_number; ++i)
     {
@@ -213,8 +214,6 @@ FillArray (struct file_input_str* const file_input,
 
         file_input->test_str_index += scanned_symbols;
     }
-
-    return array;
 }
 
 static void
@@ -262,14 +261,11 @@ SetTestNames (struct file_names* const names,
 }
 
 static void
-EndCurrentTest (int* const array,
-                struct file_ptrs* const files,
+EndCurrentTest (struct file_ptrs* const files,
                 struct file_input_str* const file_input)
 {
     assert (files);
     assert (file_input);
-
-    free (array);
 
     fclose (files->test);
     fclose (files->answer);

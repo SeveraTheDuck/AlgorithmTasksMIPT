@@ -38,7 +38,7 @@ void
 QuickLomutoSort (int* const   array,
                  const size_t elem_number)
 {
-    if (array == NULL) return;
+    if (array == NULL || elem_number == 0) return;
 
     QuickSort (array, 0, elem_number - 1, LomutoPartition);
 }
@@ -47,7 +47,7 @@ void
 QuickHoareSort (int* const   array,
                 const size_t elem_number)
 {
-    if (array == NULL) return;
+    if (array == NULL || elem_number == 0) return;
 
     QuickSort (array, 0, elem_number - 1, HoarePartition);
 }
@@ -56,7 +56,7 @@ void
 QuickThickSort (int* const   array,
                 const size_t elem_number)
 {
-    if (array == NULL) return;
+    if (array == NULL || elem_number == 0) return;
 
     QsortRecursionThickPartition (array, 0, elem_number - 1);
 }

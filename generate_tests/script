@@ -4,10 +4,10 @@
 # Consts
 #------------------------------------------------------------------------------
 # tests generator executable
-gen_test_exe=gen_test.exe
+gen_test_exe=gen_test
 
 # tests answers generator executable
-gen_answ_exe=gen_answer.exe
+gen_answ_exe=gen_answer
 
 # main tests directory name
 tests_dir=./tests
