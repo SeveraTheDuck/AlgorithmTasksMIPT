@@ -49,11 +49,11 @@ int main()
     // TestSort ("tests/medium_tests", "output/mergeit.txt",
     //           0, 100000, 1000, 1, MergeIterativeSort);
 
-    TestSort ("tests/big_tests", "output/lomuto.txt",
-              0, 1000000, 10000, 1, QuickLomutoSort);
+    TestSort ("tests/medium_tests", "output/lomuto.txt",
+              0, 100000, 1000, 1, QuickLomutoSort);
 
-    // TestSort ("tests/big_tests", "output/hoare.txt",
-    //           0, 1000000, 10000, 1, QuickHoareSort);
+    TestSort ("tests/big_tests", "output/hoare.txt",
+              0, 1000000, 10000, 1, QuickHoareSort);
 
     // TestSort ("tests/big_tests", "output/thick.txt",
     //           0, 1000000, 10000, 1, QuickThickSort);
