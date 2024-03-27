@@ -4,6 +4,7 @@
 
 int main()
 {
+    clock_t start = clock();
     // TestSort ("tests/small_tests", "output/bubblesort.txt",
     //           0, 1000, 50, 5, BubbleSort);
 
@@ -49,8 +50,8 @@ int main()
     // TestSort ("tests/medium_tests", "output/mergeit.txt",
     //           0, 100000, 1000, 1, MergeIterativeSort);
 
-    TestSort ("tests/medium_tests", "output/lomuto.txt",
-              0, 100000, 1000, 1, QuickLomutoSort);
+    // TestSort ("tests/medium_tests", "output/lomuto.txt",
+    //           0, 100000, 1000, 1, QuickLomutoSort);
 
     TestSort ("tests/big_tests", "output/hoare.txt",
               0, 1000000, 10000, 1, QuickHoareSort);
@@ -66,6 +67,9 @@ int main()
 
     // TestSort ("tests/test_most_duplicates", "output/thick_dub.txt",
     //           0, 1000000, 10000, 1, QuickThickSort);
+
+    clock_t end = clock();
+    fprintf (stderr, "Total time: %lg\n", (double)(end - start) / CLOCKS_PER_SEC);
 
     return 0;
 }

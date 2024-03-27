@@ -19,13 +19,6 @@ struct file_names
     char* answer;
 };
 
-struct file_ptrs
-{
-    FILE* output;
-    FILE* test;
-    FILE* answer;
-};
-
 struct file_input_str
 {
     char* test;
@@ -44,20 +37,13 @@ TestSort (const char*  const test_folder,
           void (*sort) (int* const, size_t));
 
 struct file_names*
-FileNamesConstructor (const char* const test_folder,
-                      const char* const output_file_name);
-
-struct file_ptrs*
-FilePointersConstructor (const char* const output_file_name);
+FileNamesConstructor (const char* const test_folder);
 
 struct file_input_str*
 FileInputConstructor ();
 
 struct file_names*
 FileNamesDestructor (struct file_names* const names);
-
-struct file_ptrs*
-FilePointersDestructor (struct file_ptrs* const files);
 
 struct file_input_str*
 FileInputDestructor (struct file_input_str* const file_input);
