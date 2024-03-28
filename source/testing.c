@@ -73,7 +73,7 @@ TestSort (const char*  const test_folder,
     clock_t sort_begin = 0;
     clock_t sort_end   = 0;
 
-    const size_t total_test_number = (to - from) / step;
+    const size_t total_test_number = (to - from + 1) / step * size_tests_num;
     size_t cur_test_cnt = 0;
 
     for (size_t cur_size = from; cur_size <= to; cur_size += step)

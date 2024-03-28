@@ -28,7 +28,7 @@ INCLUDE  := -I$(INCLUDE_DIR) -I$(LIB_INCLUDE_DIR)
 
 #------------------------------------------------------------------------------
 # compile main file
-$(RUN_TESTS): $(OBJECT_DIR) $(OBJECT) $(LIB_OBJECT) 
+$(RUN_TESTS): $(OBJECT_DIR) $(OBJECT) $(LIB_OBJECT)
 	@$(CC) $(FLAGS) $(SANITIZE) $(INCLUDE) $(OBJECT) $(LIB_OBJECT) -o $@
 
 # include dependencies
@@ -37,7 +37,7 @@ $(RUN_TESTS): $(OBJECT_DIR) $(OBJECT) $(LIB_OBJECT)
 # make object files
 $(OBJECT_DIR)%.o: $(SOURCE_DIR)%.c
 	@$(CC) $(FLAGS) $(SANITIZE) $(INCLUDE) -MMD -MF $@.d -c -o $@ $<
-	
+
 # make lib object files
 $(OBJECT_DIR)%.o: $(LIB_SOURCE_DIR)%.c
 	@$(CC) $(FLAGS) $(SANITIZE) $(INCLUDE) -MMD -MF $@.d -c -o $@ $<
@@ -45,6 +45,7 @@ $(OBJECT_DIR)%.o: $(LIB_SOURCE_DIR)%.c
 # make object directory
 $(OBJECT_DIR):
 	@mkdir -p $(OBJECT_DIR)
+	@mkdir -p $(OUTPUT_DIR)
 #------------------------------------------------------------------------------
 
 
@@ -55,7 +56,7 @@ MAKE_ANSWER_SOURCE  := generate_tests/source/standard_qsort.c
 SCRIPT 			    := generate_tests/script
 
 VERY_SMALL_TESTS    	:= very_small_tests 1 150 1 5 2100000000
-SMALL_TESTS 			:= small_tests 0 10000 100 5 2100000000
+SMALL_TESTS 			:= small_tests 0 1000 50 5 2100000000
 BIG_TESTS 				:= big_tests 0 1000000 10000 1 2100000000
 TEST_MOST_DUBLICATES	:= test_most_dublicates 0 1000000 10000 1 10000
 

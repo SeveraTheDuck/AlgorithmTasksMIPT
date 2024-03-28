@@ -52,10 +52,9 @@ void
 SelectionSort (int* const   array,
                const size_t elem_number)
 {
-    if (array == NULL) return;
+    if (array == NULL || elem_number == 0) return;
 
     size_t min_index = 0;
-
     for (size_t i = 0; i < elem_number - 1; ++i)
     {
         min_index = i;
