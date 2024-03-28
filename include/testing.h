@@ -40,7 +40,7 @@ struct file_names*
 FileNamesConstructor (const char* const test_folder);
 
 struct file_input_str*
-FileInputConstructor ();
+FileInputConstructor (void);
 
 struct file_names*
 FileNamesDestructor (struct file_names* const names);

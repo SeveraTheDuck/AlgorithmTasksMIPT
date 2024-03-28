@@ -132,7 +132,7 @@ FileNamesConstructor (const char* const test_folder)
 }
 
 struct file_input_str*
-FileInputConstructor ()
+FileInputConstructor (void)
 {
     struct file_input_str* const file_input =
         (struct file_input_str* const) calloc (1, sizeof (struct file_input_str));
@@ -222,7 +222,6 @@ CheckArray (const int* const array,
     assert (file_input);
 
     int check_elem = 0;
-    int scanned_symbols = 0;
 
     for (size_t i = 0; i < elem_number; ++i)
     {

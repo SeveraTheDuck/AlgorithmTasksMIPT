@@ -10,8 +10,9 @@ enum int_compare
     GREATER =  1
 };
 
-int int_cmp (void* elem1,
-             void* elem2);
+int 
+int_cmp (void* elem1,
+         void* elem2);
 
 void
 int_swap (int* first, int* second);

@@ -2,7 +2,7 @@
 
 
 
-int main()
+int main (void)
 {
     clock_t start = clock();
     // TestSort ("tests/small_tests", "output/bubblesort.txt",

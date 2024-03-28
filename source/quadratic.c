@@ -1,5 +1,4 @@
 #include "../include/quadratic.h"
-#include <stdio.h>
 
 const size_t SHELL_SORT_KNUT_INIT_STEP       = 1;
 const size_t SHELL_SORT_KNUT_STEP_MULTIPLIER = 3;
