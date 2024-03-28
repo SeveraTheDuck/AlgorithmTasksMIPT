@@ -10,6 +10,7 @@
 ### Report
 1. **Quadratic sorts**
 *Plot:*
+![quadratic sorts plot](./plots/quadratic.png)
 *Result:*
 Shell sort shows significantly better performance than other sorts, being twice faster than Selection sort.
 Selection sort works faster than Insertion sort, and Bubble sort is the slowest.
@@ -22,6 +23,7 @@ Selection sort works faster than Insertion sort, and Bubble sort is the slowest.
 
 3. **Merge sort**
 *Plot:*
+![merge sort plot](./plots/merge.png)
 *Result:*
 Recursive and iterative versions have similar performance, so there is no significant difference between them, except memory usage.
 Recursive Merge sort uses $O(n + logn)$ memory, while iterative Merge sort uses $O(n)$ memory because it doesn't need stack for function calls.
@@ -29,12 +31,14 @@ Recursive Merge sort uses $O(n + logn)$ memory, while iterative Merge sort uses 
 
 
 4. **Quick sort**
-4.1. Big tests
+    1. ***Big tests***
 *Plot:*
+![quick sort plot](./plots/qsort.png)
 *Result:*
 Hoare partition is the fastest, then goes Lomuto partition and thick partition.
-4.2 Most dublicates tests
+    2. ***Most dublicates tests***
 *Plot:*
+![quick sort dublicates plot](./plots/qsort_dub.png)
 *Result:*
 Here thick partition shows better results than in the previous paragraph - better than Lomuto partition. Hoare partition is still the best.
 
