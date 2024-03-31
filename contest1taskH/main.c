@@ -212,26 +212,62 @@ CompareInt (const void* const elem1,
 
 
 //-----------------------------------------------------------------------------
-// Main function
+// Main functions
 //-----------------------------------------------------------------------------
+int*
+ReadIntArray (const size_t elem_number);
+
+void
+PrintIntArray (const int* const array,
+               const size_t elem_number);
+
 int main (void)
 {
     size_t N = 0;
-    scanf ("%zd", &N);
+    assert (scanf ("%zd", &N) == 1);
 
-    int* a = (int*) calloc (N, sizeof (int));
+    int* const a = ReadIntArray (N);
     assert (a);
-
-    for (size_t i = 0; i < N; ++i)
-        scanf ("%d", &a[i]);
 
     QuickSort (a, N, sizeof (int), CompareInt);
 
-    for (size_t i = 0; i < N; ++i)
-        printf ("%d ", a[i]);
+    PrintIntArray (a, N);
 
     free (a);
     return 0;
+}
+
+int*
+ReadIntArray (const size_t elem_number)
+{
+    if (elem_number == 0) return NULL;
+
+    // use malloc instead of calloc for better performance
+    int* const array = malloc (elem_number * sizeof (int));
+    if (array == NULL) return NULL;
+
+    for (size_t i = 0; i < elem_number; i++)
+    {
+        if (scanf ("%d", &array[i]) != 1)
+        {
+            free (array);
+            return NULL;
+        }
+    }
+
+    return array;
+}
+
+void
+PrintIntArray (const int* const array,
+               const size_t elem_number)
+{
+    if (array == NULL) return;
+
+    for (size_t i = 0; i < elem_number; i++)
+        printf ("%d ", array[i]);
+
+    printf ("\n");
 }
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
