@@ -5,7 +5,7 @@
 #include "heapsort.h"
 #include "mergesort.h"
 #include "qsort.h"
-// #include "qsort_optimization.h"
+#include "qsort_optimization.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
