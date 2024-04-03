@@ -20,28 +20,11 @@ const size_t HASH_PRIME_MODULE = 1000000007;
 // Structs and types
 //-----------------------------------------------------------------------------
 typedef
-struct key
-{
-    void*  key_data;
-    size_t key_size;
-}
-key;
-
-typedef
-struct value
-{
-    void*  value_data;
-    size_t value_size;
-}
-value;
-
-typedef
 struct hash_table_data
 {
-    key*   key;
-    value* value;
-    bool   is_empty;
-} 
+    int  key;
+    bool is_filled;
+}
 hash_table_data;
 
 typedef
@@ -78,11 +61,13 @@ fixed_set;
 // Hash table functions' prototypes
 //-----------------------------------------------------------------------------
 fixed_set*
-FixedSetConstructor (const size_t keys_number,
-                     const key** const keys_array);
+FixedSetConstructor (const int* const keys_array,
+                     const size_t keys_number);
 
 second_level_hash_table**
-FixedSetTablesArrayConstructor (const size_t keys_number,
+FixedSetTablesArrayConstructor (const int* const keys_array,
+                                const size_t keys_number,
+                                const size_t* const collisions_num_array,
                                 const hash_function_coefs* const coefs);
 
 second_level_hash_table*
@@ -91,26 +76,18 @@ SecondLevelHashTableConstructor (const size_t keys_number);
 hash_function_coefs*
 HashFunctionCoefsConstructor (void);
 
-hash_table_data*
-HashTableDataConstructor (const void* const key,
-                          const void* const value,
-                          const size_t key_size,
-                          const size_t value_size);
-
 fixed_set*
 FixedSetDestructor (fixed_set* const set);
 
 second_level_hash_table**
-FixedSetTablesArrayDestructor (second_level_hash_table** const tables_array);
+FixedSetTablesArrayDestructor (second_level_hash_table** const tables_array,
+                               const size_t keys_number);
 
 second_level_hash_table*
 SecondLevelHashTableDestructor (second_level_hash_table* const table);
 
 hash_function_coefs*
 HashFunctionCoefsDestructor (hash_function_coefs* const coefs);
-
-hash_table_data*
-HashTableDataDestructor (hash_table_data* const data);
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 
@@ -120,8 +97,8 @@ HashTableDataDestructor (hash_table_data* const data);
 // Hash table functions' implementation
 //-----------------------------------------------------------------------------
 fixed_set*
-FixedSetConstructor (const size_t keys_number,
-                     const key** const keys_array)
+FixedSetConstructor (const int* const keys_array,
+                     const size_t keys_number)
 {
     if (keys_number == 0 || keys_array == NULL) return NULL;
 
@@ -134,31 +111,32 @@ FixedSetConstructor (const size_t keys_number,
     set->coefs = HashFunctionCoefsConstructor ();
     if (set->coefs == NULL)
         return FixedSetDestructor (set);
-
-    size_t* const collisions_num =
+//sep func begin
+    size_t* const collisions_num_array =
         (size_t*) calloc (keys_number, sizeof (size_t));
-    if (collisions_num == NULL)
+    if (collisions_num_array == NULL)
         return FixedSetDestructor (set);
 
     bool function_is_ok =
-        CheckHashFunction (keys_number, keys_array,
-                           collisions_num, set->coefs);
+        CheckHashFunction (keys_array, keys_number,
+                           collisions_num_array, set->coefs);
 
     while (function_is_ok == false)
     {
-        memset (collisions_num, 0, keys_number * sizeof (size_t));
         HashFunctionSetNewCoefs (set->coefs);
-
-        function_is_ok = CheckHashFunction (keys_number, keys_array,
-                                            collisions_num, set->coefs);
+        function_is_ok = CheckFirstLevelHashFunction (keys_array, keys_number,
+                                                      collisions_num_array,
+                                                      set->coefs);
     }
+// sep func end
 
     set->tables_array = 
-        FixedSetTablesArrayConstructor (keys_number, set->coefs);
+        FixedSetTablesArrayConstructor (keys_array, keys_number, 
+                                        collisions_num_array, set->coefs);
     if (set->tables_array == NULL)
         return FixedSetDestructor (set);
     
-    free (collisions_num);
+    free (collisions_num_array);
 
     return set;
 }
@@ -172,7 +150,8 @@ FixedSetDestructor (fixed_set* const set)
         set->coefs = HashFunctionCoefsDestructor (set->coefs);
 
     if (set->tables_array)
-        set->tables_array = FixedSetTablesArrayDestructor (set->tables_array);
+        set->tables_array = FixedSetTablesArrayDestructor (set->tables_array,
+                                                           set->keys_number);
 
     free (set);
 
@@ -180,16 +159,129 @@ FixedSetDestructor (fixed_set* const set)
 }
 
 second_level_hash_table**
-FixedSetTablesArrayConstructor (const size_t keys_number,
+FixedSetTablesArrayConstructor (const int* const keys_array,
+                                const size_t keys_number,
+                                const size_t* const collisions_num_array,
                                 const hash_function_coefs* const coefs)
 {
-    if (keys_number == 0 || coefs == NULL) return NULL;
+    if (keys_array           == NULL ||
+        keys_number          == 0    || 
+        collisions_num_array == NULL ||
+        coefs                == NULL) 
+        return NULL;
 
     second_level_hash_table** const tables_array = (second_level_hash_table**)
         calloc (keys_number, sizeof (second_level_hash_table*));
     if (tables_array == NULL) return NULL;
 
+    const size_t collisions_max_num = 
+        ArrayMaxValue (collisions_num_array, keys_array);
 
+    bool function_is_ok = false;
+
+    for (size_t i = 0; i < keys_number; ++i)
+    {
+        if (collisions_num_array[i] == 0) continue;
+        
+        while (function_is_ok == false)
+        {
+            tables_array[i] = 
+                SecondLevelHashTableConstructor (collisions_num_array[i]);
+            if (tables_array == NULL)
+                return FixedSetTablesArrayDestructor (tables_array, keys_number);
+
+            function_is_ok = CheckAndFillSecondLevelTable ();
+
+            if (function_is_ok) break;
+
+            tables_array[i] =
+                SecondLevelHashTableDestructor (tables_array[i]);
+        }
+        
+        function_is_ok = false;
+    }
+
+    return tables_array;
+}
+
+second_level_hash_table**
+FixedSetTablesArrayDestructor (second_level_hash_table** const tables_array,
+                               const size_t keys_number)
+{
+    if (tables_array == NULL) return NULL;
+
+    for (size_t i = 0; i < keys_number; ++i)
+        tables_array[i] = SecondLevelHashTableDestructor (tables_array[i]);
+
+    free (tables_array);
+    return NULL;
+}
+
+second_level_hash_table*
+SecondLevelHashTableConstructor (const size_t keys_number)
+{
+    if (keys_number == 0) return NULL;
+
+    second_level_hash_table* const table = (second_level_hash_table*)
+        calloc (1, sizeof (second_level_hash_table));
+    if (table == NULL) return NULL;
+
+    table->elem_number = keys_number * keys_number;
+
+    table->coefs = HashFunctionCoefsConstructor ();
+    if (table->coefs == NULL)
+        return SecondLevelHashTableDestructor (table);
+
+    table->data_array = (hash_table_data*)
+        calloc (table->elem_number, sizeof (hash_table_data));
+    if (table->data_array == NULL)
+        return SecondLevelHashTableDestructor (table);
+
+    return table;
+}
+
+second_level_hash_table*
+SecondLevelHashTableDestructor (second_level_hash_table* const table)
+{
+    if (table == NULL) return NULL;
+
+    if (table->coefs)
+        table->coefs = HashFunctionCoefsDestructor (table->coefs);
+
+    if (table->data_array)
+        free (table->data_array);
+
+    free (table);
+    return NULL;
+}
+
+hash_function_coefs*
+HashFunctionCoefsConstructor (void)
+{
+    hash_function_coefs* const coefs = (hash_function_coefs*)
+        calloc (1, sizeof (hash_function_coefs));
+    if (coefs == NULL) return NULL;
+
+    HashFunctionSetNewCoefs (coefs);
+
+    return coefs;
+}
+
+void
+HashFunctionSetNewCoefs (hash_function_coefs* const coefs)
+{
+    if (coefs == NULL) return;
+
+    coefs->a = 1 + rand () % HASH_PRIME_MODULE;
+    coefs->b =     rand () % HASH_PRIME_MODULE;
+}
+
+hash_function_coefs*
+HashFunctionCoefsDestructor (hash_function_coefs* const coefs)
+{
+    if (coefs == NULL) return NULL;
+    free (coefs);
+    return NULL;
 }
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
