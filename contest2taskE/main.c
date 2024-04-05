@@ -30,7 +30,7 @@ struct avl_tree_node
     struct avl_tree_node* left;
     struct avl_tree_node* right;
     struct avl_tree_node* parent;
-    size_t branch_height;
+    int height_diff;
 }
 avl_tree_node;
 
@@ -78,6 +78,10 @@ AVLTreeInsertKey (avl_tree*           const tree,
                   const avl_tree_key* const key);
 
 avl_tree_error_t
+AVLTreeInsertKeySetParent (avl_tree*      const tree,
+                           avl_tree_node* const node);
+
+avl_tree_error_t
 AVLTreeDeleteKey (avl_tree*           const tree,
                   const avl_tree_key* const key);
 
@@ -112,10 +116,6 @@ AVLTreeNodeConstructor (const avl_tree_key* const key,
 
 avl_tree_node*
 AVLTreeNodeDestructor (avl_tree_node* const node);
-
-size_t
-MaxBranchHeight (const avl_tree_node* const first,
-                 const avl_tree_node* const second);
 
 avl_tree_key*
 AVLTreeKeyConstructor (const void* const data,
@@ -176,30 +176,72 @@ AVLTreeInsertKey (avl_tree*           const tree,
         AVLTreeNodeConstructor (key, NULL, NULL, NULL);
     if (new_node == NULL) return AVL_TREE_ERROR;
 
-    avl_tree_node* parent = tree->head;
+    if (AVLTreeInsertKeySetParent (tree, new_node) == AVL_TREE_ERROR)
+    {
+        AVLTreeNodeDestructor (new_node);
+        return AVL_TREE_ERROR;
+    }
+
+    tree->elem_num++;
+
+    if (AVLTreeInsertKeyFixHeights (new_node) == AVL_TREE_ERROR)
+        return AVL_TREE_ERROR;
+
+    return AVL_TREE_SUCCESS;
+}
+
+avl_tree_error_t
+AVLTreeInsertKeySetParent (avl_tree*      const tree,
+                           avl_tree_node* const node)
+{
+    if (tree == NULL ||
+        node == NULL)
+        return AVL_TREE_ERROR;
+
+    avl_tree_node* parent       = tree->head;
     avl_tree_node* insert_place = tree->head;
 
     while (insert_place != NULL)
     {
         parent = insert_place;
 
-        if (tree->compare (key, insert_place->key) == AVL_TREE_CMP_GREATER)
+        if (tree->compare (node->key, insert_place->key) == AVL_TREE_CMP_GREATER)
              insert_place = insert_place->right;
         else insert_place = insert_place->left;
     }
 
-    new_node->parent = parent;
+    node->parent = parent;
 
-    if (parent == NULL) tree->head = new_node;
+    if (parent == NULL) tree->head = node;
 
-    else if (tree->compare (key, parent->key) == AVL_TREE_CMP_GREATER)
-         parent->right = new_node;
+    else if (tree->compare (node->key, parent->key) == AVL_TREE_CMP_GREATER)
+         parent->right = node;
 
-    else parent->left = new_node;
+    else parent->left = node;
 
-    tree->elem_num++;
+    return AVL_TREE_SUCCESS;
+}
 
-    // fix heights
+avl_tree_error_t
+AVLTreeInsertKeyFixHeights (avl_tree_node* const node)
+{
+    if (node == NULL) return AVL_TREE_ERROR;
+
+    avl_tree_node* parent = node->parent;
+
+    while (parent != NULL)
+    {
+        if (parent->left == node) parent->height_diff++;
+        else parent->height_diff--;
+
+        if (parent->height_diff == 0) break;
+
+        if (parent->height_diff ==  1 ||
+            parent->height_diff == -1)
+            parent = parent->parent;
+
+        else parent = AVLTreeRotateSubtree (parent);
+    }
 
     return AVL_TREE_SUCCESS;
 }
@@ -256,10 +298,10 @@ AVLTreeReplaceDeletedNode (avl_tree*            const tree,
 
     if (replace_node)
     {
-        replace_node->parent = del_node->parent;
-        replace_node->left   = del_node->left;
-        replace_node->right  = del_node->right;
-        // branch height?
+        replace_node->parent      = del_node->parent;
+        replace_node->left        = del_node->left;
+        replace_node->right       = del_node->right;
+        replace_node->height_diff = del_node->height_diff; //???
     }
 
     return AVL_TREE_SUCCESS;
@@ -379,7 +421,7 @@ AVLTreeNodeConstructor (const avl_tree_key* const key,
     node->left   = left;
     node->right  = right;
     node->parent = parent;
-    node->branch_height = MaxBranchHeight (left, right);
+    node->height_diff = 0;
 
     return node;
 }
@@ -396,20 +438,6 @@ AVLTreeNodeDestructor (avl_tree_node* const node)
 
     free (node);
     return NULL;
-}
-
-size_t
-MaxBranchHeight (const avl_tree_node* const first,
-                 const avl_tree_node* const second)
-{
-    size_t answer = 0;
-
-    if (first) answer = first->branch_height;
-
-    if (second && second->branch_height > answer)
-        answer = second->branch_height;
-
-    return answer;
 }
 
 avl_tree_key*
@@ -440,6 +468,14 @@ AVLTreeKeyDestructor (avl_tree_key* const key)
 
     free (key);
     return NULL;
+}
+
+avl_tree_node*
+AVLTreeRotateSubtree (avl_tree_node* const node)
+{
+    if (node == NULL) return NULL;
+
+    if (node)
 }
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
