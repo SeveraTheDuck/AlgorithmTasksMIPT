@@ -147,15 +147,15 @@ FixedSetConstructor (const int* const keys_array,
     if (collisions_num_array == NULL)
         return FixedSetDestructor (set);
 
-    set->tables_array = 
-        FixedSetTablesArrayConstructor (keys_array, keys_number, 
+    set->tables_array =
+        FixedSetTablesArrayConstructor (keys_array, keys_number,
                                         collisions_num_array, set->coefs);
     if (set->tables_array == NULL)
     {
         free (collisions_num_array);
         return FixedSetDestructor (set);
     }
-    
+
     free (collisions_num_array);
 
     return set;
@@ -218,7 +218,7 @@ CheckFirstLevelHashFunction (const int* const keys_array,
 
     size_t total_col_squares = 0;
     for (size_t i = 0; i < keys_number; ++i)
-        total_col_squares += collisions_num_array[i] * 
+        total_col_squares += collisions_num_array[i] *
                              collisions_num_array[i];
 
     if (total_col_squares > 4 * keys_number)
@@ -232,7 +232,7 @@ FixedSetDestructor (fixed_set* const set)
 {
     if (set == NULL) return NULL;
 
-    if (set->coefs) 
+    if (set->coefs)
         set->coefs = HashFunctionCoefsDestructor (set->coefs);
 
     if (set->tables_array)
@@ -251,9 +251,9 @@ FixedSetTablesArrayConstructor (const int* const keys_array,
                                 const hash_function_coefs* const first_level_coefs)
 {
     if (keys_array           == NULL ||
-        keys_number          == 0    || 
+        keys_number          == 0    ||
         collisions_num_array == NULL ||
-        first_level_coefs    == NULL) 
+        first_level_coefs    == NULL)
         return NULL;
 
     second_level_hash_table** const tables_array = (second_level_hash_table**)
@@ -263,10 +263,10 @@ FixedSetTablesArrayConstructor (const int* const keys_array,
     for (size_t i = 0; i < keys_number; ++i)
     {
         if (collisions_num_array[i] == 0) continue;
-        
-        tables_array[i] = 
+
+        tables_array[i] =
             SecondLevelHashTableConstructor (keys_array, keys_number,
-                                             collisions_num_array[i], 
+                                             collisions_num_array[i],
                                              first_level_coefs, i);
         if (tables_array[i] == NULL)
             return FixedSetTablesArrayDestructor (tables_array, keys_number);
@@ -298,7 +298,7 @@ SecondLevelHashTableConstructor (const int* const keys_array,
     if (keys_array        == NULL ||
         keys_number       == 0    ||
         collisions_number == 0    ||
-        first_level_coefs == NULL) 
+        first_level_coefs == NULL)
         return NULL;
 
     second_level_hash_table* const table = (second_level_hash_table*)
@@ -346,10 +346,10 @@ SetSecondLevelHashFunction (const int* const keys_array,
 
         for (size_t i = 0; i < keys_number; ++i)
         {
-            if (HashFunction (keys_array[i], keys_number, 
+            if (HashFunction (keys_array[i], keys_number,
                               first_level_coefs) == table_index)
             {
-                new_elem_index = 
+                new_elem_index =
                     HashFunction (keys_array[i], table->elem_number, coefs);
 
                 if (table->data_array[new_elem_index].is_filled == false)
@@ -358,10 +358,10 @@ SetSecondLevelHashFunction (const int* const keys_array,
                     table->data_array[new_elem_index].is_filled = true;
                 }
 
-                else 
+                else
                 {
                     function_is_ok = false;
-                    memset (table->data_array, 0, 
+                    memset (table->data_array, 0,
                             table->elem_number * sizeof (hash_table_data));
 
                     break;
@@ -463,14 +463,13 @@ const char END_OF_INPUT = '.';
 const char* const YES_STR = "YES";
 const char* const NO_STR  = "NO";
 
-
 int*
 ReadArray (const size_t N);
 
 int main (void)
 {
     size_t N = 0;
-    assert (scanf ("%zd", &N) == 1); 
+    assert (scanf ("%zd", &N) == 1);
 
     int* const a = ReadArray (N);
     assert (a);
@@ -480,17 +479,12 @@ int main (void)
 
     int input = 0;
 
-    while (true)
+    while (scanf ("%d", &input) == 1)
     {
-        if (scanf ("%d", &input) == 1)
-        {
-            if (IsInFixedSet (input, set))
-                printf ("%s\n", YES_STR);
+        if (IsInFixedSet (input, set))
+            printf ("%s\n", YES_STR);
 
-            else printf ("%s\n", NO_STR);
-        }
-
-        else break;
+        else printf ("%s\n", NO_STR);
     }
 
     if (getchar() != END_OF_INPUT)
