@@ -3,6 +3,7 @@
 #include <assert.h>
 #include <string.h>
 #include <stdbool.h>
+#include <limits.h>
 
 
 
@@ -230,6 +231,9 @@ AVLTreeInsertImplementration (avl_tree*           const tree,
                               avl_tree_node*      const node,
                               const avl_tree_key* const key)
 {
+    if (tree == NULL)
+        return NULL;
+
     if (node == NULL)
         return AVLTreeNodeConstructor (key, NULL, NULL);
 
@@ -371,7 +375,7 @@ AVLTreeNodeConstructor (const avl_tree_key* const key,
     node->left  = left;
     node->right = right;
 
-    node->branch_height = 0;
+    node->branch_height = 1;
 
     return node;
 }
@@ -385,6 +389,7 @@ AVLTreeNodeDestructor (avl_tree_node* const node)
 
     node->left  = NULL;
     node->right = NULL;
+    node->branch_height = 0;
 
     free (node);
     return NULL;
@@ -533,7 +538,7 @@ enum operation
 };
 
 int int_cmp (const avl_tree_key* const a,
-                  const avl_tree_key* const b)
+             const avl_tree_key* const b)
 {
     assert (a);
     assert (b);
@@ -547,32 +552,45 @@ int int_cmp (const avl_tree_key* const a,
     return AVL_TREE_CMP_EQUAL;
 }
 
-const avl_tree_node*
+int
 AVLTreeFindNext (const avl_tree*     const tree,
                  const avl_tree_key* const key)
 {
     assert (tree);
+    assert (key);
 
     const avl_tree_node* cur_node = tree->head;
-    const avl_tree_node* parent   = NULL;
+    int min_greater_or_equal = INT_MAX;
 
     while (cur_node != NULL)
     {
-        parent = cur_node;
-
         if (tree->compare (key, cur_node->key) == AVL_TREE_CMP_LESS)
+        {
+            if (min_greater_or_equal > *(int*)cur_node->key->data)
+                min_greater_or_equal = *(int*)cur_node->key->data;
+
             cur_node = cur_node->left;
+        }
 
         else if (tree->compare (key, cur_node->key) == AVL_TREE_CMP_GREATER)
             cur_node = cur_node->right;
 
-        else break;
+        else return *(int*)key->data;
     }
 
-    if (parent == NULL || tree->compare (key, parent->key) == AVL_TREE_CMP_GREATER)
-        return NULL;
+    if (min_greater_or_equal == INT_MAX)
+        return NOT_FOUND;
 
-    return parent;
+    return min_greater_or_equal;
+}
+
+void
+PrintInOrder (const avl_tree_node* const node)
+{
+    if (node == NULL) return;
+    PrintInOrder (node->left);
+    printf ("%d ", *(int*)node->key->data);
+    PrintInOrder (node->right);
 }
 
 int main (void)
@@ -589,35 +607,30 @@ int main (void)
 
     unsigned char operation = 0;
     int yoda_magic = 0;
-    const avl_tree_node* find_node = NULL;
 
     for (size_t i = 0; i < n; ++i)
     {
-        assert (scanf (" %c %d", &operation, &input) == 2);
+        while (getchar() != '\n');
+
+        assert (scanf ("%c %d", &operation, &input) == 2);
         *(int*)key->data = input;
 
         if (operation == OP_ADD)
         {
-            *(int*)key->data += yoda_magic;
-            *(int*)key->data %= MAX_INPUT_VALUE;
+            if (yoda_magic)
+            {
+                *(int*)key->data += yoda_magic;
+                *(int*)key->data %= MAX_INPUT_VALUE;
+            }
+
             AVLTreeInsertKey (tree, key);
             yoda_magic = 0;
         }
 
         else if (operation == OP_NEXT)
         {
-            find_node = AVLTreeFindNext (tree, key);
-            if (find_node == NULL)
-            {
-                printf ("%d\n", NOT_FOUND);
-                yoda_magic = NOT_FOUND;
-            }
-
-            else
-            {
-                yoda_magic = *(unsigned*)find_node->key->data;
-                printf ("%u\n", yoda_magic);
-            }
+            yoda_magic = AVLTreeFindNext (tree, key);
+            printf ("%d\n", yoda_magic);
         }
 
         else assert (0);
