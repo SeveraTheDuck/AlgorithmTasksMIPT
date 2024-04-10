@@ -1,5 +1,8 @@
 #include "binomial_heap.h"
 #include <stdio.h>
+
+
+
 static binomial_heap_node*
 BinomialHeapMergeRoots (binomial_heap_node* const list1,
                         binomial_heap_node* const list2);

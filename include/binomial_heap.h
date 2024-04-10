@@ -46,4 +46,4 @@ BinomialHeapNodeDestructor (binomial_heap_node* const node);
 
 
 
-#endif
+#endif /* BINOMIAL_HEAP_H */
