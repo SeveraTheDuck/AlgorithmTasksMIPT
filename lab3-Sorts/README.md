@@ -13,7 +13,7 @@
 
     *Plot:*
 
-    ![quadratic sorts plot](/plots/quadratic.png)
+    ![quadratic sorts plot](./plots/quadratic.png)
 
     *Result:*
 
@@ -31,7 +31,7 @@
 
     *Plot:*
 
-    ![merge sorts plot](/plots/merge.png)
+    ![merge sorts plot](./plots/merge.png)
 
     *Result:*
 
@@ -46,7 +46,7 @@
 
         *Plot:*
 
-        ![quick sort plot](/plots/qsort.png)
+        ![quick sort plot](./plots/qsort.png)
 
         *Result:*
 
@@ -56,7 +56,7 @@
 
         *Plot:*
 
-        ![quick sort dublicates plot](/plots/qsort_dub.png)
+        ![quick sort dublicates plot](./plots/qsort_dub.png)
 
         *Result:*
 
