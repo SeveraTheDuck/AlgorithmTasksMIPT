@@ -31,7 +31,7 @@
 
     *Plot:*
 
-    ![merge sorts plot](plots/merge.png)
+    ![merge sorts plot](./plots/merge.png)
 
     *Result:*
 
