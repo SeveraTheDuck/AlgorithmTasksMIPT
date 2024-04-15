@@ -23,14 +23,14 @@ int CompareInt (const void* elem1,
 int main ()
 {
     size_t elem_number = 0;
-    scanf ("%zd", &elem_number);
+    assert (scanf ("%zd", &elem_number) == 1);
 
     int* const array =
         (int* const) calloc (elem_number, sizeof (int));
     assert (array);
 
     for (size_t i = 0; i < elem_number; ++i)
-        scanf ("%d", &array[i]);
+        assert (scanf ("%d", &array[i]) == 1);
 
     qsort (array, elem_number, sizeof (int), CompareInt);
 
