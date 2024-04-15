@@ -38,7 +38,7 @@ void
 QuickOneRecursionBranchSort (int* const   array,
                              const size_t elem_number)
 {
-    if (array == NULL) return;
+    if (array == NULL || elem_number == 0) return;
 
     QsortLessRecursion (array, 0, elem_number - 1, MiddlePivot);
 }
@@ -131,7 +131,7 @@ Median3Pivot (int* const   array,
     int median = ThreeElementsMedian (array[left_index],
                                       array[mid_index],
                                       array[right_index]);
-    
+
     if (median == array[left_index])  return left_index;
     if (median == array[right_index]) return right_index;
     return mid_index;

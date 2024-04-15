@@ -60,7 +60,7 @@ SCRIPT 			    := generate_tests/script
 VERY_SMALL_TESTS_NAME 		:= very_small_tests
 SMALL_TESTS_NAME 			:= small_tests
 BIG_TESTS_NAME 				:= big_tests
-TEST_MOST_DUBLICATES_NAME	:= test_most_dublicates 
+TEST_MOST_DUBLICATES_NAME	:= test_most_dublicates
 
 VERY_SMALL_TESTS    		:= $(VERY_SMALL_TESTS_NAME) 	1 150     1 	5 2100000000
 SMALL_TESTS 				:= $(SMALL_TESTS_NAME)      	0 1000    50 	5 2100000000
@@ -97,10 +97,11 @@ THICK_SORT 		= $(OUTPUT_DIR)thick.txt
 LOMUTO_DUB 		= $(OUTPUT_DIR)lomuto_dub.txt
 HOARE_DUB 		= $(OUTPUT_DIR)hoare_dub.txt
 THICK_DUB 		= $(OUTPUT_DIR)thick_dub.txt
+HOARE_LESS_REC  = $(OUTPUT_DIR)hoare_less_rec.txt
 
 makeplots:
-	@$(PY) $(MAKE_PLOT_SOURCE) $(PLOTS_DIR) quadratic 4 $(BUBBLE_SORT) $(INSERTION_SORT) $(SELECTION_SORT) $(SHELL_SORT)
-	@$(PY) $(MAKE_PLOT_SOURCE) $(PLOTS_DIR) merge	  2 $(MERGE_REC_SORT) $(MERGE_IT_SORT)
-	@$(PY) $(MAKE_PLOT_SOURCE) $(PLOTS_DIR) qsort 	  3 $(LOMUTO_SORT) $(HOARE_SORT) $(THICK_SORT)
-	@$(PY) $(MAKE_PLOT_SOURCE) $(PLOTS_DIR) qsort_dub 3 $(LOMUTO_DUB) $(HOARE_DUB) $(THICK_DUB)
-
+	@$(PY) $(MAKE_PLOT_SOURCE) $(PLOTS_DIR) qsort_less_rec 	1 $(HOARE_SORT)
+	# @$(PY) $(MAKE_PLOT_SOURCE) $(PLOTS_DIR) quadratic 		4 $(BUBBLE_SORT) 	$(INSERTION_SORT) $(SELECTION_SORT) $(SHELL_SORT)
+	# @$(PY) $(MAKE_PLOT_SOURCE) $(PLOTS_DIR) merge	  		2 $(MERGE_REC_SORT) $(MERGE_IT_SORT)
+	# @$(PY) $(MAKE_PLOT_SOURCE) $(PLOTS_DIR) qsort 	  		3 $(LOMUTO_SORT) 	$(HOARE_SORT) 	  $(THICK_SORT)
+	# @$(PY) $(MAKE_PLOT_SOURCE) $(PLOTS_DIR) qsort_dub 		3 $(LOMUTO_DUB) 	$(HOARE_DUB) 	  $(THICK_DUB)
