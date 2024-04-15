@@ -1,0 +1,80 @@
+#!/bin/bash
+
+#------------------------------------------------------------------------------
+# Consts
+#------------------------------------------------------------------------------
+# tests generator executable
+gen_test_exe=gen_test
+
+# tests answers generator executable
+gen_answ_exe=gen_answer
+
+# main tests directory name
+tests_dir=./tests
+#------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
+
+echo $@
+
+
+#------------------------------------------------------------------------------
+# check and generate main tests directory
+#------------------------------------------------------------------------------
+if [ ! -d $tests_dir ]
+    then mkdir $tests_dir
+fi
+#------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
+
+
+
+#------------------------------------------------------------------------------
+# Get directory name to make and make it in the main tests directory
+#------------------------------------------------------------------------------
+cur_tests_dir=$tests_dir/$1
+if [ -d $cur_tests_dir ]
+    then rm -rf $cur_tests_dir
+fi
+mkdir $cur_tests_dir
+#------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
+
+
+
+#------------------------------------------------------------------------------
+# Get input variables:
+# from              - minimal array size
+# to                - maximal array size
+# step              - difference between array sizes
+# size_tests_number - number of tests for each size
+# max_elem_value    - max possible value in array
+#------------------------------------------------------------------------------
+# from, to, step vars from terminal
+from=$2
+to=$3
+step=$4
+
+# number of tests of each size from terminal
+max_test_number=$5
+
+# max value of array element
+max_elem_value=$6
+#------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
+
+
+#------------------------------------------------------------------------------
+# Generate tests
+#------------------------------------------------------------------------------
+for (( cur_size=$from; cur_size <= $to; cur_size += $step))
+do
+    for (( cur_test=0; cur_test < $max_test_number; ++cur_test))
+    do
+        touch "$cur_tests_dir/$cur_size""_$cur_test.in"
+        touch "$cur_tests_dir/$cur_size""_$cur_test.out"
+        ./$gen_test_exe $cur_size $max_elem_value >> "$cur_tests_dir/$cur_size""_$cur_test.in"
+        ./$gen_answ_exe < "$cur_tests_dir/$cur_size""_$cur_test.in" >> "$cur_tests_dir/$cur_size""_$cur_test.out"
+    done
+done
+#------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
