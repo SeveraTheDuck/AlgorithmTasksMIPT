@@ -1,19 +1,22 @@
+#include <assert.h>
+#include <limits.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
 #include <string.h>
-#include <stdbool.h>
-#include <limits.h>
 
 
 
 //-----------------------------------------------------------------------------
 // Constants
 //-----------------------------------------------------------------------------
-const int AVL_TREE_SMALL_LEFT_ROTATE  = -2;
-const int AVL_TREE_SMALL_RIGHT_ROTATE =  2;
-const int AVL_TREE_BIG_LEFT_ROTATE    =  1;
-const int AVL_TREE_BIG_RIGHT_ROTATE   = -1;
+enum avl_tree_rotates
+{
+    AVL_TREE_SMALL_LEFT_ROTATE  = -2,
+    AVL_TREE_BIG_RIGHT_ROTATE   = -1,
+    AVL_TREE_BIG_LEFT_ROTATE    =  1,
+    AVL_TREE_SMALL_RIGHT_ROTATE =  2
+};
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 
@@ -362,6 +365,7 @@ AVLTreeNodeConstructor (const avl_tree_key* const key,
 {
     avl_tree_node* const node =
         (avl_tree_node*) malloc (sizeof (avl_tree_node));
+    if (node == NULL) return NULL;
 
     if (key == NULL) node->key = NULL;
 
@@ -561,10 +565,13 @@ AVLTreeFindNext (const avl_tree*     const tree,
 
     const avl_tree_node* cur_node = tree->head;
     int min_greater_or_equal = INT_MAX;
+    int cmp_status = false;
 
     while (cur_node != NULL)
     {
-        if (tree->compare (key, cur_node->key) == AVL_TREE_CMP_LESS)
+        cmp_status = tree->compare (key, cur_node->key);
+
+        if (cmp_status == AVL_TREE_CMP_LESS)
         {
             if (min_greater_or_equal > *(int*)cur_node->key->data)
                 min_greater_or_equal = *(int*)cur_node->key->data;
@@ -572,7 +579,7 @@ AVLTreeFindNext (const avl_tree*     const tree,
             cur_node = cur_node->left;
         }
 
-        else if (tree->compare (key, cur_node->key) == AVL_TREE_CMP_GREATER)
+        else if (cmp_status == AVL_TREE_CMP_GREATER)
             cur_node = cur_node->right;
 
         else return *(int*)key->data;
@@ -593,48 +600,89 @@ PrintInOrder (const avl_tree_node* const node)
     PrintInOrder (node->right);
 }
 
+size_t
+GetRequestsNumber (void)
+{
+    size_t n = 0;
+    assert (scanf ("%zd", &n) == 1);
+
+    return n;
+}
+
+int
+RequestAdd (avl_tree* const tree,
+            avl_tree_key* const input_key,
+            const int yoda_magic)
+{
+    assert (tree);
+    assert (input_key);
+
+    if (yoda_magic)
+    {
+        *(int*)input_key->data += yoda_magic;
+        *(int*)input_key->data %= MAX_INPUT_VALUE;
+    }
+
+    AVLTreeInsertKey (tree, input_key);
+    return 0;
+}
+
+int
+RequestFindNext (avl_tree* const tree,
+                 avl_tree_key* const input_key)
+{
+    assert (tree);
+    assert (input_key);
+
+    int yoda_magic = AVLTreeFindNext (tree, input_key);
+    printf ("%d\n", yoda_magic);
+
+    return yoda_magic;
+}
+
+void
+ExecuteRequests (avl_tree*     const tree,
+                 avl_tree_key* const input_key,
+                 const size_t requests_number)
+{
+    assert (tree);
+    assert (input_key);
+
+    int input_value = 0;
+    unsigned char operation = 0;
+    int yoda_magic = 0;
+
+    for (size_t i = 0; i < requests_number; ++i)
+    {
+        while (getchar() != '\n');
+
+        assert (scanf ("%c %d", &operation, &input_value) == 2);
+        *(int*)input_key->data = input_value;
+
+        if (operation == OP_ADD)
+            yoda_magic = RequestAdd (tree, input_key, yoda_magic);
+
+        else if (operation == OP_NEXT)
+            yoda_magic = RequestFindNext (tree, input_key);
+
+        else assert (0);
+    }
+}
+
+
+
 int main (void)
 {
     avl_tree* tree = AVLTreeConstructor (int_cmp);
     assert (tree);
 
-    int input = 0;
-    avl_tree_key* key = AVLTreeKeyConstructor (&input, sizeof (int));
+    int temp = 0;
+    avl_tree_key* key = AVLTreeKeyConstructor (&temp, sizeof (int));
     assert (key);
 
-    size_t n = 0;
-    assert (scanf ("%zd", &n) == 1);
+    size_t requests_number = GetRequestsNumber ();
 
-    unsigned char operation = 0;
-    int yoda_magic = 0;
-
-    for (size_t i = 0; i < n; ++i)
-    {
-        while (getchar() != '\n');
-
-        assert (scanf ("%c %d", &operation, &input) == 2);
-        *(int*)key->data = input;
-
-        if (operation == OP_ADD)
-        {
-            if (yoda_magic)
-            {
-                *(int*)key->data += yoda_magic;
-                *(int*)key->data %= MAX_INPUT_VALUE;
-            }
-
-            AVLTreeInsertKey (tree, key);
-            yoda_magic = 0;
-        }
-
-        else if (operation == OP_NEXT)
-        {
-            yoda_magic = AVLTreeFindNext (tree, key);
-            printf ("%d\n", yoda_magic);
-        }
-
-        else assert (0);
-    }
+    ExecuteRequests (tree, key, requests_number);
 
     tree = AVLTreeDestructor (tree);
     key  = AVLTreeKeyDestructor (key);
