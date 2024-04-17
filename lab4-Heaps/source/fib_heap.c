@@ -1,8 +1,13 @@
 #include "../include/fib_heap.h"
-#include "stdio.h" // DEBUGGGGGGGGGGGGGGGGGGGg
+
+
+
 const int FIB_HEAP_POISON = INT_MAX;
 
 
+
+static void
+FibHeapConsolidate (fib_heap* const heap);
 
 static void
 MakeNullParentsForChildren (fib_heap_node* const node);
@@ -157,6 +162,9 @@ FibHeapDecreaseKey (fib_heap* const heap,
     FibHeapCut (heap, node);
     FibHeapCascadingCut (heap, parent);
 
+    if (node->key < heap->min_elem->key)
+        heap->min_elem = node;
+
     return FIB_HEAP_SUCCESS;
 }
 
@@ -193,7 +201,7 @@ UnionCyclicLists (fib_heap_node* const first,
     return first;
 }
 
-void
+static void
 FibHeapConsolidate (fib_heap* const heap)
 {
     if (heap           == NULL ||

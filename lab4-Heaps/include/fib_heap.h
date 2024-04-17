@@ -36,8 +36,7 @@ enum fib_heap_errors
 
 typedef size_t fib_heap_error_t;
 
-void
-FibHeapConsolidate (fib_heap* const heap);
+
 
 fib_heap*
 FibHeapConstructor ();

@@ -22,7 +22,7 @@
 //     return 0;
 // }
 
-const size_t N = 4;
+const size_t N = 5;
 
 int main (void)
 {
@@ -45,6 +45,11 @@ int main (void)
     fprintf (stderr, "\n");
 
     FibHeapExtractMin (heap);
+    fib_heap_node* del_n = heap->min_elem->child->right->child;
+    fprintf (stderr, "del_n %d\n", del_n->key);
+    FibHeapDeleteKey (heap, del_n);
+
+    fprintf (stderr, "%d\n", heap->min_elem->key);
 
     heap = FibHeapDestructor (heap);
     return 0;
