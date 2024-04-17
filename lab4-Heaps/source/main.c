@@ -36,20 +36,15 @@ int main (void)
     }
     fprintf (stderr, "\n");
 
-    FibHeapConsolidate (heap);
-
-    // FibHeapExtractMin (heap);
-
     fib_heap_node* cur = heap->min_elem;
-    fprintf (stderr, "minptr = %p\n", cur);
-    for (size_t i = 0; i < N - 1; ++i)
+    for (size_t i = 0; i < N; ++i)
     {
-        fprintf (stderr, "cur = %d\n", cur->key);
+        fprintf (stderr, "%d ", cur->key);
         cur = cur->right;
     }
+    fprintf (stderr, "\n");
 
-    // for (size_t i = 0; i < 5; ++i)
-    //     FibHeapExtractMin (heap);
+    FibHeapExtractMin (heap);
 
     heap = FibHeapDestructor (heap);
     return 0;

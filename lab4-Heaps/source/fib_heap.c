@@ -11,8 +11,6 @@ static fib_heap_node*
 UnionCyclicLists (fib_heap_node* const first,
                   fib_heap_node* const second);
 
-
-
 static void
 FibHeapCut (fib_heap* const heap,
             fib_heap_node* const node);
@@ -22,15 +20,19 @@ FibHeapCascadingCut (fib_heap* const heap,
                      fib_heap_node*  node);
 
 static void
-FibHeapSwapNodes (fib_heap_node* const node1,
-                  fib_heap_node* const node2);
+FibHeapSwapNodes (fib_heap_node** const node1,
+                  fib_heap_node** const node2);
 
 static void
 FibHeapLink (fib_heap_node* const y,
              fib_heap_node* const x);
 
-static fib_heap_node*
-FibHeapFromRootsArray (fib_heap_node** const roots_array,
+static void
+FibHeapCutNode (fib_heap_node* const node);
+
+static void
+FibHeapFromRootsArray (fib_heap* const heap,
+                       fib_heap_node** const roots_array,
                        const size_t roots_max_num);
 
 fib_heap*
@@ -38,7 +40,7 @@ FibHeapConstructor ()
 {
     fib_heap* const heap =
         (fib_heap*) calloc (1, sizeof (fib_heap));
-    
+
     return heap;
 }
 
@@ -61,8 +63,9 @@ FibHeapNodeConstructor (const int key)
         (fib_heap_node*) calloc (1, sizeof (fib_heap_node));
     if (node == NULL) return NULL;
 
-    node->key  = key;
-    node->mark = false;
+    node->key   = key;
+    node->left  = node;
+    node->right = node;
 
     return node;
 }
@@ -79,23 +82,24 @@ FibHeapNodeDestructor (fib_heap_node* const node)
 int
 FibHeapGetMin (const fib_heap* const heap)
 {
-    if (heap == NULL ||
+    if (heap       == NULL ||
         heap->size == 0)
         return FIB_HEAP_POISON;
 
-    return heap->min_elem->key; 
+    return heap->min_elem->key;
 }
 
 fib_heap_error_t
 FibHeapExtractMin (fib_heap* const heap)
 {
-    if (heap == NULL || heap->min_elem == NULL)
+    if (heap           == NULL ||
+        heap->min_elem == NULL)
         return FIB_HEAP_ERROR;
 
     fib_heap_node* const prev_min = heap->min_elem;
 
     MakeNullParentsForChildren (prev_min);
-    UnionCyclicLists (heap->min_elem, heap->min_elem->child);
+    UnionCyclicLists (prev_min, prev_min->child);
 
     prev_min->left->right = prev_min->right;
     prev_min->right->left = prev_min->left;
@@ -124,25 +128,7 @@ FibHeapInsert (fib_heap* const heap,
     fib_heap_node* const new_node = FibHeapNodeConstructor (key);
     if (new_node == NULL) return NULL;
 
-    fib_heap_node* prev_right = NULL;
-
-    if (heap->size == 0)
-    {
-        new_node->left  = new_node;
-        new_node->right = new_node;
-        heap->min_elem  = new_node;
-    }
-
-    else
-    {
-        prev_right = heap->min_elem->right;
-
-        heap->min_elem->right = new_node;
-        new_node->left = heap->min_elem;
-        
-        prev_right->left = new_node;
-        new_node->right = prev_right;
-    }
+    heap->min_elem = UnionCyclicLists (heap->min_elem, new_node);
 
     if (new_node->key < heap->min_elem->key)
         heap->min_elem = new_node;
@@ -199,8 +185,8 @@ UnionCyclicLists (fib_heap_node* const first,
     fib_heap_node* const left_node  = first->left;
     fib_heap_node* const right_node = second->right;
 
-    second->right = first;
-    first->left   = second;
+    second->right    = first;
+    first->left      = second;
     left_node->right = right_node;
     right_node->left = left_node;
 
@@ -211,62 +197,46 @@ void
 FibHeapConsolidate (fib_heap* const heap)
 {
     if (heap           == NULL ||
-        heap->min_elem == NULL) 
+        heap->min_elem == NULL)
         return;
 
-    fib_heap_node** const nodes_array = 
+    fib_heap_node** const roots_array =
         (fib_heap_node**) calloc (heap->size, sizeof (fib_heap_node*));
-    if (nodes_array == NULL) return;
+    if (roots_array == NULL) return;
 
     fib_heap_node* cur  = heap->min_elem;
     fib_heap_node* next = NULL;
     fib_heap_node* x    = NULL;
     fib_heap_node* y    = NULL;
     size_t d = 0;
-    
-    // fib_heap_node* print_node = heap->min_elem;
-
-    // for (size_t i = 0; i < heap->size; i++)
-    // {
-    //     fprintf (stderr, "%d ", print_node->key);
-    //     print_node = print_node->right;
-    // }
 
     do
     {
         x = cur;
         next = cur->right;
-        cur->right = cur;
-        cur->left  = cur;
-
-        // fprintf (stderr, "cur %d next %d\n", cur->key, next->key);
 
         d = x->degree;
-
-        while (nodes_array[d] != NULL)
+        while (roots_array[d] != NULL)
         {
-            y = nodes_array[d];
-
-            // fprintf (stderr, "x %d, y %d\n", x->key, y->key);
+            y = roots_array[d];
 
             if (x->key > y->key)
-                FibHeapSwapNodes (x, y);
+                FibHeapSwapNodes (&x, &y);
 
             FibHeapLink (y, x);
-            nodes_array[d] = NULL;
+
+            roots_array[d] = NULL;
             ++d;
         }
 
-        nodes_array[d] = x;
+        roots_array[d] = x;
         cur = next;
-    } 
+    }
     while (cur != heap->min_elem);
 
-    fprintf (stderr, "\n%d\n", heap->min_elem->key);
+    FibHeapFromRootsArray (heap, roots_array, heap->size);
 
-    heap->min_elem = FibHeapFromRootsArray (nodes_array, heap->size);
-
-    free (nodes_array);
+    free (roots_array);
 }
 
 static void
@@ -274,7 +244,8 @@ MakeNullParentsForChildren (fib_heap_node* const node)
 {
     if (node == NULL) return;
 
-    fib_heap_node* cur = node->child;
+    fib_heap_node* const first_child = node->child;
+    fib_heap_node* cur = first_child;
     if (cur == NULL) return;
 
     do
@@ -282,65 +253,68 @@ MakeNullParentsForChildren (fib_heap_node* const node)
         cur->parent = NULL;
         cur = cur->right;
     }
-    while (cur != node->child);
+    while (cur != first_child);
 }
 
 static void
 FibHeapLink (fib_heap_node* const y,
              fib_heap_node* const x)
 {
-    if (x->child == NULL)
-    {
-        x->child  = y;
-        y->parent = x;
-        y->left   = y;
-        y->right  = y;
-    }
+    if (y == NULL ||
+        x == NULL)
+        return;
 
-    else
-    {
-        y->parent = x;
-        y->left->right = y->right;
-        y->right->left = y->left;
-        y->right = x->child;
-        x->child->right->left = y;
-        x->child->right = y;
-    }
+    FibHeapCutNode (y);
+
+    x->child = UnionCyclicLists (x->child, y);
+
+    y->parent = x;
+    ++x->degree;
 
     y->mark = false;
-    ++x->degree;
 }
 
-static fib_heap_node*
+static void
+FibHeapCutNode (fib_heap_node* const node)
+{
+    if (node == NULL) return;
+
+    node->left->right = node->right;
+    node->right->left = node->left;
+    node->left        = node;
+    node->right       = node;
+}
+
+static void
 FibHeapFromRootsArray (fib_heap* const heap,
                        fib_heap_node** const roots_array,
                        const size_t roots_max_num)
 {
     if (heap        == NULL ||
         roots_array == NULL)
-        return NULL;
+        return;
 
     heap->min_elem = NULL;
 
-    fib_heap_node* cur  = roots_array[0];
-    fib_heap_node* prev = NULL;
+    fib_heap_node* cur = NULL;
 
     for (size_t i = 0; i < roots_max_num; ++i)
     {
         cur = roots_array[i];
+
         if (cur != NULL)
         {
-            if (heap->min_elem == NULL)
-                heap->min_elem = cur;
+            cur->left   = cur;
+            cur->right  = cur;
+            cur->parent = NULL;
 
-            else
+            heap->min_elem = UnionCyclicLists (heap->min_elem, cur);
+            if (cur->key < heap->min_elem->key)
             {
-                heap->min
+                heap->min_elem = cur;
             }
         }
     }
-
-    return min;
 }
 
 static void
@@ -391,14 +365,14 @@ FibHeapCascadingCut (fib_heap* const heap,
 }
 
 static void
-FibHeapSwapNodes (fib_heap_node* const node1,
-                  fib_heap_node* const node2)
+FibHeapSwapNodes (fib_heap_node** const node1,
+                  fib_heap_node** const node2)
 {
     if (node1 == NULL ||
         node2 == NULL)
         return;
 
-    fib_heap_node temp = *node1;
+    fib_heap_node* const temp = *node1;
     *node1 = *node2;
     *node2 = temp;
 }
