@@ -56,6 +56,7 @@ typedef int dynamic_array_error_t;
 /**
  * @brief Main struct.
  */
+typedef
 struct dynamic_array
 {
     void* data_array;           ///< Pointer to array with all elements.
@@ -66,7 +67,7 @@ struct dynamic_array
 
     bool enable_realloc;        ///< Enable or disable realloc during push/pop.
     bool save_array;            ///< Save or destroy data_array in DynamicArrayDestructor().
-};
+} dynamic_array;
 
 /**
  * @brief Makes the struct and returns a pointer to it.

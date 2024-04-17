@@ -59,6 +59,7 @@ KHeapDestructor (struct k_heap* const heap)
     heap->k = K_HEAP_NULL_SIZE;
     heap->cmp = NULL;
 
+    free (heap);
     return NULL;
 }
 
@@ -222,4 +223,6 @@ swap (void* elem1, void* elem2, const size_t elem_size)
     memcpy (tmp_elem, elem2,    elem_size);
     memcpy (elem2,    elem1,    elem_size);
     memcpy (elem1,    tmp_elem, elem_size);
+
+    free (tmp_elem);
 }

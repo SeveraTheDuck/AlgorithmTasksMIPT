@@ -3,6 +3,7 @@
 
 
 const int FIB_HEAP_POISON = INT_MAX;
+#define GOLDEN_RATIO (1.0 + sqrt (5)) / 2.0
 
 
 
@@ -39,6 +40,9 @@ static void
 FibHeapFromRootsArray (fib_heap* const heap,
                        fib_heap_node** const roots_array,
                        const size_t roots_max_num);
+
+static size_t
+FibHeapMaxDegree (const size_t elem_number);
 
 fib_heap*
 FibHeapConstructor ()
@@ -208,8 +212,10 @@ FibHeapConsolidate (fib_heap* const heap)
         heap->min_elem == NULL)
         return;
 
+    const size_t roots_array_size = FibHeapMaxDegree (heap->size);
+
     fib_heap_node** const roots_array =
-        (fib_heap_node**) calloc (heap->size, sizeof (fib_heap_node*));
+        (fib_heap_node**) calloc (roots_array_size, sizeof (fib_heap_node*));
     if (roots_array == NULL) return;
 
     fib_heap_node* cur  = heap->min_elem;
@@ -242,7 +248,7 @@ FibHeapConsolidate (fib_heap* const heap)
     }
     while (cur != heap->min_elem);
 
-    FibHeapFromRootsArray (heap, roots_array, heap->size);
+    FibHeapFromRootsArray (heap, roots_array, roots_array_size);
 
     free (roots_array);
 }
@@ -383,4 +389,12 @@ FibHeapSwapNodes (fib_heap_node** const node1,
     fib_heap_node* const temp = *node1;
     *node1 = *node2;
     *node2 = temp;
+}
+
+static size_t
+FibHeapMaxDegree (const size_t elem_number)
+{
+    if (elem_number == 0) return 0;
+
+    return (size_t) (log ((double)elem_number) / log (GOLDEN_RATIO) + 1);
 }

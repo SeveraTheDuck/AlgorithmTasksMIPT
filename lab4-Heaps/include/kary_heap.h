@@ -15,13 +15,14 @@ enum k_heap_error_status
 
 typedef int k_heap_error_t;
 
+typedef
 struct k_heap
 {
     size_t k;
     const void* infinity_value;
     int (*cmp) (void*, void*);
     struct dynamic_array* d_array;
-};
+} k_heap;
 
 struct k_heap*
 KHeapConstructor (struct dynamic_array* d_array,
