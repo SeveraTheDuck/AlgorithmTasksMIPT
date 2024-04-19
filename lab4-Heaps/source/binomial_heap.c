@@ -1,5 +1,4 @@
 #include "binomial_heap.h"
-#include <stdio.h>
 
 
 
@@ -17,10 +16,10 @@ binomial_heap_node*
 BinomialHeapDestructor (binomial_heap_node* const heap)
 {
     if (heap == NULL) return NULL;
-    
+
     heap->sibling = BinomialHeapDestructor (heap->sibling);
     heap->child   = BinomialHeapDestructor (heap->child);
-    
+
     return BinomialHeapNodeDestructor (heap);
 }
 
@@ -31,7 +30,7 @@ BinomialHeapMerge (binomial_heap_node* const heap1,
     if (heap1 == NULL) return heap2;
     if (heap2 == NULL) return heap1;
 
-    binomial_heap_node* const head = 
+    binomial_heap_node* const head =
         BinomialHeapMergeRoots (heap1, heap2);
     if (head == NULL) return NULL;
 
@@ -43,7 +42,7 @@ BinomialHeapMerge (binomial_heap_node* const heap1,
 
     while (next != NULL)
     {
-        if (cur->degree != next->degree || 
+        if (cur->degree != next->degree ||
             next->sibling != NULL && next->sibling->degree == cur->degree)
         {
             prev = cur;
@@ -75,7 +74,7 @@ binomial_heap_node*
 BinomialHeapInsert (binomial_heap_node* const heap,
                     const int key)
 {
-    binomial_heap_node* const new_node = 
+    binomial_heap_node* const new_node =
         BinomialHeapNodeConstructor (key);
     if (new_node == NULL) return NULL;
 

@@ -1,8 +1,6 @@
 #include "kary_heap.h"
 #include "common.h"
 #include <limits.h>
-#include <stdio.h>
-#include <time.h>
 
 
 

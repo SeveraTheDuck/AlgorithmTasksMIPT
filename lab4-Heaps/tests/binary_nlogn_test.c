@@ -1,8 +1,6 @@
 #include "kary_heap.h"
 #include "common.h"
 #include <limits.h>
-#include <stdio.h>
-#include <time.h>
 
 
 
@@ -53,19 +51,6 @@ KHeapRegularInserts(int* const array,
     heap = KHeapDestructor (heap);
 
     return end - begin;
-}
-
-int*
-ReadIntArray (const size_t elem_number)
-{
-    int* const array =
-        (int*) malloc (elem_number * sizeof (int));
-    assert (array);
-
-    for (size_t i = 0; i < elem_number; i++)
-        assert (scanf ("%d", &array[i]) == 1);
-
-    return array;
 }
 
 int main (void)
