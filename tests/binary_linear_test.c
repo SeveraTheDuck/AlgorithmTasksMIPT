@@ -33,22 +33,6 @@ int CompareInt (void* a, void* b)
 }
 
 
-clock_t
-KHeapRegularInserts (const dynamic_array* const d_array)
-{
-    assert (d_array);
-
-    const size_t elem_number = d_array->data_array_size;
-
-    k_heap* const heap = KHeapConstructor (NULL, KARY_HEAP_K, sizeof (int),
-                                           HEAP_INFINITY_VALUE, CompareInt); 
-    assert (heap);
-
-    for (size_t i = 0; i < elem_number; ++i)
-        KHeapInsert (heap, DynamicArrayGetElemPtrByIndex (d_array, i));
-
-    return heap;
-}
 
 clock_t
 KHeapLinear (dynamic_array* const d_array)
@@ -70,6 +54,8 @@ KHeapLinear (dynamic_array* const d_array)
 
     return end - begin;
 }
+
+
 
 int main (void)
 {
