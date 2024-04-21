@@ -122,6 +122,17 @@ SplayTreeInsertImpl (splay_tree*        const tree,
 //-------------------------------------
 
 //-------------------------------------
+// Delete functions
+splay_error_t
+SplayTreeDeleteKey (splay_tree*      const tree,
+                    const splay_key* const key);
+
+splay_node*
+SplayFindMaxKey    (splay_tree* const tree);
+//-------------------------------------
+
+
+//-------------------------------------
 // Find functions
 splay_node*
 SplayTreeFind (splay_tree*      const tree,
@@ -191,7 +202,8 @@ SplayTreeDestructor (splay_tree* const tree)
 {
     if (tree == NULL) return NULL;
 
-    // kill everything with queue
+    while (tree->root != NULL)
+        SplayTreeDeleteKey (tree, tree->root->key);
 
     free (tree);
     return NULL;
@@ -219,8 +231,11 @@ SplayNodeDestructor (splay_node* const node)
 {
     if (node == NULL) return NULL;
 
-    node->key   = SplayKeyDestructor   (node->key);
-    node->value = SplayValueDestructor (node->value);
+    node->key    = SplayKeyDestructor   (node->key);
+    node->value  = SplayValueDestructor (node->value);
+    node->left   = NULL;
+    node->right  = NULL;
+    node->parent = NULL;
 
     free (node);
     return NULL;
@@ -375,6 +390,58 @@ SplayTreeInsertImpl (splay_tree*        const tree,
     new_node->parent = prev;
 
     return new_node;
+}
+//-------------------------------------
+
+//-------------------------------------
+// Delete functions
+splay_error_t
+SplayTreeDeleteKey (splay_tree*      const tree,
+                    const splay_key* const key)
+{
+    if (tree == NULL) return SPLAY_TREE_ERROR;
+    
+    splay_node* const del_node = SplayTreeFind (tree, key);
+    if (del_node == NULL) return SPLAY_TREE_ERROR;
+    splay_node* const prev_right = tree->root->right;
+    splay_node* const prev_left  = tree->root->left;
+
+    if (prev_left != NULL)
+    {
+        tree->root = prev_left;
+        prev_left->parent = NULL;
+
+        Splay (tree, SplayFindMaxKey (tree));
+        tree->root->right = prev_right;
+    }
+    
+    else 
+    {
+        tree->root = prev_right;
+        if (prev_right != NULL)
+            prev_right->parent = NULL;
+    }
+
+    SplayNodeDestructor (del_node);
+
+    return SPLAY_TREE_SUCCESS;
+}
+
+splay_node*
+SplayFindMaxKey (splay_tree* const tree)
+{
+    if (tree       == NULL || 
+        tree->root == NULL) 
+        return NULL;
+
+    splay_node* node = tree->root;
+
+    while (node->right != NULL)
+        node = node->right;
+
+    Splay (tree, node);
+
+    return node;
 }
 //-------------------------------------
 
@@ -633,6 +700,9 @@ ReadTree (splay_tree* const tree,
         SplayTreeInsert (tree, key, value);
         SplayTreeInsert (rev_tree, (splay_key*)value, (splay_value*)key);
     }
+
+    key   = SplayKeyDestructor   (key);
+    value = SplayValueDestructor (value);
 }
 
 void
@@ -645,7 +715,7 @@ ExecuteRequests (splay_tree* const tree,
 
     for (size_t i = 0; i < Q; ++i)
     {
-        scanf ("%s%n", (char*)key->key, &key->key_len);
+        scanf ("%s%n", (char*)key->key, (int*)&key->key_len);
         ++key->key_len;
 
         node = SplayTreeFind (tree, key);
