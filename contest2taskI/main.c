@@ -6,7 +6,7 @@
 
 
 
-const size_t STRING_MAX_LEN = 0x1000;
+const size_t STRING_MAX_LEN = 0x400;
 
 
 
@@ -400,7 +400,7 @@ SplayTreeDeleteKey (splay_tree*      const tree,
                     const splay_key* const key)
 {
     if (tree == NULL) return SPLAY_TREE_ERROR;
-    
+
     splay_node* const del_node = SplayTreeFind (tree, key);
     if (del_node == NULL) return SPLAY_TREE_ERROR;
     splay_node* const prev_right = tree->root->right;
@@ -414,8 +414,8 @@ SplayTreeDeleteKey (splay_tree*      const tree,
         Splay (tree, SplayFindMaxKey (tree));
         tree->root->right = prev_right;
     }
-    
-    else 
+
+    else
     {
         tree->root = prev_right;
         if (prev_right != NULL)
@@ -430,8 +430,8 @@ SplayTreeDeleteKey (splay_tree*      const tree,
 splay_node*
 SplayFindMaxKey (splay_tree* const tree)
 {
-    if (tree       == NULL || 
-        tree->root == NULL) 
+    if (tree       == NULL ||
+        tree->root == NULL)
         return NULL;
 
     splay_node* node = tree->root;
@@ -693,7 +693,7 @@ ReadTree (splay_tree* const tree,
 
     for (size_t i = 0; i < N; ++i)
     {
-        assert (scanf ("%s %s", (char*)key->key, (char*)value->value) == 2);
+        assert (scanf ("%1024s %1024s", (char*)key->key, (char*)value->value) == 2);
         key->key_len     = strlen (key->key)     + 1;
         value->value_len = strlen (value->value) + 1;
 
@@ -715,7 +715,7 @@ ExecuteRequests (splay_tree* const tree,
 
     for (size_t i = 0; i < Q; ++i)
     {
-        scanf ("%s%n", (char*)key->key, (int*)&key->key_len);
+        scanf ("%1024s%n", (char*)key->key, (int*)&key->key_len);
         ++key->key_len;
 
         node = SplayTreeFind (tree, key);
