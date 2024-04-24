@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
 
 
 
@@ -122,14 +123,14 @@ TreapValueCopy        (const treap_value* const value);
 // Treap split and merge
 // cut_number is number of nodes to leave in pair->tree1
 treap_pair*
-TreapSplit             (treap* const tree,
+TreapSplit             (treap*           const tree,
                         const treap_key* const key);
 
 treap_pair*
-TreapSplitImpl         (treap_node* const tree,
+TreapSplitImpl         (treap_node*      const tree,
                         const treap_key* const key,
-                        int (*key_cmp) (const treap_key* const,
-                                        const treap_key* const));
+                        int (*key_cmp)  (const treap_key* const,
+                                         const treap_key* const));
 treap_node*
 TreapMerge             (treap_node* const tree1,
                         treap_node* const tree2);
@@ -151,32 +152,32 @@ TreapSize              (const treap_node* const tree);
 //-------------------------------------
 // Treap find, insert and delete
 treap_node*
-TreapFind   (const treap*     const tree,
-             const treap_key* const key);
+TreapFind            (const treap*     const tree,
+                      const treap_key* const key);
 
 treap_node*
-TreapFindImpl (treap_node* const tree,
-               const treap_key*  const key,
-               int (*key_cmp) (const treap_key* const,
-                               const treap_key* const));
+TreapFindImpl        (treap_node*      const tree,
+                      const treap_key* const key,
+                      int (*key_cmp)  (const treap_key* const,
+                                       const treap_key* const));
 
 treap_error_t
-TreapInsert (treap*             const tree,
-             const treap_key*   const key,
-             const treap_value* const value);
+TreapInsert          (treap*             const tree,
+                      const treap_key*   const key,
+                      const treap_value* const value);
 
 treap_error_t
-TreapInsertImpl (treap*             const tree,
-                 const treap_key*   const key,
-                 const treap_value* const value);
+TreapInsertImpl      (treap*             const tree,
+                      const treap_key*   const key,
+                      const treap_value* const value);
 
 treap_error_t
-TreapDelete (treap*           const tree,
-             const treap_key* const key);
+TreapDelete          (treap*           const tree,
+                      const treap_key* const key);
 
 treap_error_t
-TreapDeleteImpl (treap*      const tree,
-                 treap_node* const found_node);
+TreapDeleteImpl      (treap*      const tree,
+                      treap_node* const found_node);
 
 treap_error_t
 TreapDeleteFoundNode (treap_pair* const pair,
@@ -343,7 +344,7 @@ TreapValueCopy (const treap_value* const value)
 //-------------------------------------
 // Treap split and merge
 treap_pair*
-TreapSplit (treap* const tree,
+TreapSplit (treap*           const tree,
             const treap_key* const key)
 {
     if (tree == NULL) return TreapPairConstructor (NULL, NULL);
@@ -352,10 +353,10 @@ TreapSplit (treap* const tree,
 }
 
 treap_pair*
-TreapSplitImpl (treap_node* const tree,
+TreapSplitImpl (treap_node*      const tree,
                 const treap_key* const key,
-                int (*key_cmp) (const treap_key* const,
-                                const treap_key* const))
+                int (*key_cmp)  (const treap_key* const,
+                                 const treap_key* const))
 {
     if (tree == NULL)
         return TreapPairConstructor (NULL, NULL);
@@ -392,7 +393,7 @@ TreapMerge (treap_node* const tree1,
     if (tree1 == NULL) return tree2;
     if (tree2 == NULL) return tree1;
 
-    if (tree1->priority < tree2->priority)
+    if (tree1->priority <= tree2->priority)
     {
         tree2->left = TreapMerge (tree1, tree2->left);
         TreapUpdateSubtreeSize (tree2);
@@ -458,10 +459,10 @@ TreapFind (const treap*     const tree,
 }
 
 treap_node*
-TreapFindImpl (treap_node* const tree,
-               const treap_key*  const key,
-               int (*key_cmp) (const treap_key* const,
-                               const treap_key* const))
+TreapFindImpl (treap_node*      const tree,
+               const treap_key* const key,
+               int (*key_cmp)  (const treap_key* const,
+                                const treap_key* const))
 {
     if (tree == NULL) return NULL;
 
@@ -560,7 +561,7 @@ TreapDeleteFoundNode (treap_pair* const pair,
 {
     if (pair->tree2 == found_node)
     {
-        pair->tree2 = NULL;
+        pair->tree2 = found_node->right;
         TreapNodeDestructor (found_node);
         return TREAP_SUCCESS;
     }
@@ -575,7 +576,8 @@ TreapDeleteFoundNode (treap_pair* const pair,
         next = next->left;
     }
 
-    cur->left = NULL;
+    cur->left = found_node->right;
+    --cur->subtree_size;
     TreapNodeDestructor (found_node);
 
     return TREAP_SUCCESS;
@@ -589,6 +591,8 @@ TreapDeleteFoundNode (treap_pair* const pair,
 //-----------------------------------------------------------------------------
 // Main functions
 //-----------------------------------------------------------------------------
+//-------------------------------------
+// Constants and types
 const size_t STRING_MAX_LEN = 7;
 const char   INSERT_STR[] = "insert";
 const char   DELETE_STR[] = "delete";
@@ -599,20 +603,6 @@ const char   KTH_STR   [] = "kth";
 const char   TRUE_STR  [] = "true";
 const char   FALSE_STR [] = "false";
 const char   NONE_STR  [] = "none";
-
-int key_cmp (const treap_key* const key1,
-             const treap_key* const key2)
-{
-    assert (key1);
-    assert (key2);
-
-    const int key1_int = *(int*) key1->key;
-    const int key2_int = *(int*) key2->key;
-
-    if (key1_int < key2_int) return TREAP_LESS;
-    if (key1_int > key2_int) return TREAP_GREATER;
-    return TREAP_EQUAL;
-}
 
 enum operation
 {
@@ -626,6 +616,23 @@ enum operation
 };
 
 typedef unsigned char operation_t;
+//-------------------------------------
+
+//-------------------------------------
+// Help functions
+int key_cmp (const treap_key* const key1,
+             const treap_key* const key2)
+{
+    assert (key1);
+    assert (key2);
+
+    const int key1_int = *(int*) key1->key;
+    const int key2_int = *(int*) key2->key;
+
+    if (key1_int < key2_int) return TREAP_LESS;
+    if (key1_int > key2_int) return TREAP_GREATER;
+    return TREAP_EQUAL;
+}
 
 operation_t
 GetOperation (const char* const operation_str)
@@ -792,7 +799,10 @@ KthOperation (const treap* const tree,
     else
         printf ("%d\n", *(int*)cur->key->key);
 }
+//-------------------------------------
 
+//-------------------------------------
+// Requests execution function
 void
 ExecuteRequests (treap* const tree)
 {
@@ -809,7 +819,7 @@ ExecuteRequests (treap* const tree)
     while (scanf ("%6s", input_str) != EOF)
     {
         operation = GetOperation (input_str);
-        if (operation == ERROR) return;
+        if (operation == ERROR) break;
 
         scanf ("%d", (int*)key->key);
 
@@ -849,6 +859,8 @@ ExecuteRequests (treap* const tree)
 
 int main (void)
 {
+    srand (time (NULL));
+
     treap* tree = TreapConstructor (key_cmp);
     assert (tree);
 
@@ -857,3 +869,4 @@ int main (void)
     tree = TreapDestructor (tree);
     return 0;
 }
+//-------------------------------------
