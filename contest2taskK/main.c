@@ -18,10 +18,10 @@ treap_value;
 
 typedef struct treap_node
 {
-    int                priority;
-    treap_value*       value;
+    int          priority;
+    treap_value* value;
 
-    size_t             subtree_size;
+    size_t subtree_size;
 
     struct treap_node* left;
     struct treap_node* right;
@@ -170,8 +170,6 @@ TreapDeleteFoundNode (treap_pair* const pair,
 treap*
 TreapConstructor (void)
 {
-    if (key_cmp == NULL) return NULL;
-
     treap* const tree = (treap*) malloc (sizeof(treap));
     if (tree == NULL) return NULL;
 
@@ -349,8 +347,8 @@ TreapPairConstructor (treap_node* const tree1,
         (treap_pair*) malloc (sizeof (treap_pair));
     if (pair == NULL) return NULL;
 
-    pair->tree1   = tree1;
-    pair->tree2   = tree2;
+    pair->tree1 = tree1;
+    pair->tree2 = tree2;
 
     return pair;
 }
@@ -419,56 +417,35 @@ TreapInsert (treap* const tree,
         value == NULL)
         return TREAP_ERROR;
 
-    return TreapInsertImpl (tree, insert_index, value);
-}
-
-treap_error_t
-TreapInsertImpl (treap* const tree,
-                 const size_t insert_index,
-                 const treap_value* const value)
-{
-    treap_pair* const split_pair = TreapSplit (tree, key);
+    treap_pair* const split_pair = TreapSplit (tree, insert_index);
     if (split_pair == NULL) return TREAP_ERROR;
 
-    treap_node* const new_node = TreapNodeConstructor (key, value);
+    treap_node* const new_node = TreapNodeConstructor (value);
     if (new_node == NULL)
     {
         TreapPairDestructor (split_pair);
         return TREAP_ERROR;
     }
 
-    treap_node* const new_tree =
-        TreapMerge (TreapMerge (split_pair->tree1, new_node),
-                    split_pair->tree2);
+    tree->root = TreapMerge (TreapMerge (split_pair->tree1, new_node),
+                             split_pair->tree2);
 
-    tree->root = new_tree;
     TreapPairDestructor (split_pair);
 
     return TREAP_SUCCESS;
 }
 
 treap_error_t
-TreapDelete (treap*           const tree,
-             const treap_key* const key)
+TreapDelete (treap* const tree,
+             const size_t delete_index)
 {
-    if (tree          == NULL ||
-        tree->key_cmp == NULL ||
-        key           == NULL)
-        return TREAP_ERROR;
+    if (tree == NULL) return TREAP_ERROR;
 
-    treap_node* const found_node = TreapFind (tree, key);
-
+    treap_node* const found_node = TreapFind (tree, delete_index);
     if (found_node == NULL)
         return TREAP_SUCCESS;
 
-    return TreapDeleteImpl (tree, found_node);
-}
-
-treap_error_t
-TreapDeleteImpl (treap*      const tree,
-                 treap_node* const found_node)
-{
-    treap_pair* const split_pair = TreapSplit (tree, found_node->key);
+    treap_pair* const split_pair = TreapSplit (tree, delete_index);
     if (split_pair == NULL) return TREAP_ERROR;
 
     TreapDeleteFoundNode (split_pair, found_node);
@@ -518,26 +495,15 @@ TreapDeleteFoundNode (treap_pair* const pair,
 //-----------------------------------------------------------------------------
 //-------------------------------------
 // Constants and types
-const size_t STRING_MAX_LEN = 7;
-const char   INSERT_STR[] = "insert";
-const char   DELETE_STR[] = "delete";
-const char   EXISTS_STR[] = "exists";
-const char   NEXT_STR  [] = "next";
-const char   PREV_STR  [] = "prev";
-const char   KTH_STR   [] = "kth";
-const char   TRUE_STR  [] = "true";
-const char   FALSE_STR [] = "false";
-const char   NONE_STR  [] = "none";
-
 enum operation
 {
-    INSERT = 0,
-    DELETE = 1,
-    EXISTS = 2,
-    NEXT   = 3,
-    PREV   = 4,
-    KTH    = 5,
-    ERROR  = 6
+    SUM              = 1,
+    INSERT           = 2,
+    DELETE           = 3,
+    SET_VALUE        = 4,
+    ADD_VALUE        = 5,
+    NEXT_PERMUTATION = 6,
+    PREV_PERMUTATION = 7
 };
 
 typedef unsigned char operation_t;
@@ -545,251 +511,76 @@ typedef unsigned char operation_t;
 
 //-------------------------------------
 // Help functions
-int key_cmp (const treap_key* const key1,
-             const treap_key* const key2)
-{
-    assert (key1);
-    assert (key2);
-
-    const int key1_int = *(int*) key1->key;
-    const int key2_int = *(int*) key2->key;
-
-    if (key1_int < key2_int) return TREAP_LESS;
-    if (key1_int > key2_int) return TREAP_GREATER;
-    return TREAP_EQUAL;
-}
-
-operation_t
-GetOperation (const char* const operation_str)
-{
-    assert (operation_str);
-
-    if (strcmp (operation_str, INSERT_STR) == 0)
-        return INSERT;
-
-    if (strcmp (operation_str, DELETE_STR) == 0)
-        return DELETE;
-
-    if (strcmp (operation_str, EXISTS_STR) == 0)
-        return EXISTS;
-
-    if (strcmp (operation_str, NEXT_STR)   == 0)
-        return NEXT;
-
-    if (strcmp (operation_str, PREV_STR)   == 0)
-        return PREV;
-
-    if (strcmp (operation_str, KTH_STR)    == 0)
-        return KTH;
-
-    return ERROR;
-}
-
 void
-InsertOperation (treap*           const tree,
-                 const treap_key* const key)
+PrintTreapInOrder (const treap_node* const node)
 {
-    assert (tree);
-    assert (key);
-
-    const treap_value* const value = (const treap_value*) key;
-
-    assert (TreapInsert (tree, key, value) == TREAP_SUCCESS);
-}
-
-void
-DeleteOperation (treap*           const tree,
-                 const treap_key* const key)
-{
-    assert (tree);
-    assert (key);
-
-    assert (TreapDelete (tree, key) == TREAP_SUCCESS);
-}
-
-void
-ExistsOperation (const treap*     const tree,
-                 const treap_key* const key)
-{
-    assert (tree);
-    assert (key);
-
-    const treap_node* const found_node = TreapFind (tree, key);
-
-    if (found_node != NULL)
-        printf ("%s\n", TRUE_STR);
-    else
-        printf ("%s\n", FALSE_STR);
-}
-
-void
-NextOperation (const treap*     const tree,
-               const treap_key* const key)
-{
-    assert (tree);
-    assert (key);
-
-    treap_node* cur = tree->root;
-    treap_node* found_next = NULL;
-
-    int cmp_status = TREAP_EQUAL;
-
-    while (cur != NULL)
+    if (node == NULL)
     {
-        cmp_status = tree->key_cmp (key, cur->key);
-
-        if (cmp_status == TREAP_LESS)
-        {
-            if (found_next == NULL) found_next = cur;
-            else if (tree->key_cmp (cur->key, found_next->key) == TREAP_LESS)
-                found_next = cur;
-
-            cur = cur->left;
-        }
-
-        else cur = cur->right;
+        printf ("nil ");
+        return;
     }
 
-    if (found_next == NULL)
-        printf ("%s\n", NONE_STR);
-
-    else
-        printf ("%d\n", *(int*)found_next->key->key);
-}
-
-void
-PrevOperation (const treap*     const tree,
-               const treap_key* const key)
-{
-    assert (tree);
-    assert (key);
-
-    treap_node* cur = tree->root;
-    treap_node* found_prev = NULL;
-
-    int cmp_status = TREAP_EQUAL;
-
-    while (cur != NULL)
-    {
-        cmp_status = tree->key_cmp (key, cur->key);
-
-        if (cmp_status == TREAP_GREATER)
-        {
-            if (found_prev == NULL) found_prev = cur;
-            else if (tree->key_cmp (cur->key, found_prev->key) == TREAP_GREATER)
-                found_prev = cur;
-
-            cur = cur->right;
-        }
-
-        else cur = cur->left;
-    }
-
-    if (found_prev == NULL)
-        printf ("%s\n", NONE_STR);
-
-    else
-        printf ("%d\n", *(int*)found_prev->key->key);
-}
-
-void
-KthOperation (const treap* const tree,
-              const size_t index)
-{
-    assert (tree);
-
-    const treap_node* cur = tree->root;
-    size_t cur_size = index;
-    size_t left_subtree_size = 0;
-
-    while (cur != NULL)
-    {
-        left_subtree_size = TreapSize (cur->left);
-
-        if (left_subtree_size == cur_size)
-            break;
-
-        else if (left_subtree_size > cur_size)
-            cur = cur->left;
-
-        else
-        {
-            cur_size -= left_subtree_size + 1;
-            cur = cur->right;
-        }
-    }
-
-    if (cur == NULL)
-        printf ("%s\n", NONE_STR);
-    else
-        printf ("%d\n", *(int*)cur->key->key);
+    printf ("(");
+    PrintTreapInOrder (node->left);
+    printf ("%d ", *(int*)node->value->value);
+    PrintTreapInOrder (node->right);
+    printf (")");
 }
 //-------------------------------------
 
 //-------------------------------------
 // Requests execution function
 void
-ExecuteRequests (treap* const tree)
+FillTreap (treap* const tree,
+           const size_t elem_number)
 {
     assert (tree);
 
-    int input_value = 0;
-    treap_key* key  = TreapKeyConstructor (&input_value, sizeof (int));
-    assert (key);
+    int temp = 0; // needed to allocate memory in TreapValueConstructor()
+    treap_value* input = TreapValueConstructor (&temp, sizeof (int));
+    assert (input);
 
-    char input_str[STRING_MAX_LEN] = {};
-
-    operation_t operation = 0;
-
-    while (scanf ("%6s", input_str) != EOF)
+    for (size_t i = 0; i < elem_number; ++i)
     {
-        operation = GetOperation (input_str);
-        if (operation == ERROR) break;
-
-        scanf ("%d", (int*)key->key);
-
-        switch (operation)
-        {
-            case INSERT:
-                InsertOperation (tree, key);
-                break;
-
-            case DELETE:
-                DeleteOperation (tree, key);
-                break;
-
-            case EXISTS:
-                ExistsOperation (tree, key);
-                break;
-
-            case NEXT:
-                NextOperation (tree, key);
-                break;
-
-            case PREV:
-                PrevOperation (tree, key);
-                break;
-
-            case KTH:
-                KthOperation (tree, *(int*)key->key);
-                break;
-
-            default:
-                return;
-        }
+        assert (scanf ("%d", (int*)input->value));
+        assert (TreapInsert (tree, i, input) == TREAP_SUCCESS);
     }
 
-    key = TreapKeyDestructor (key);
+    PrintTreapInOrder (tree->root);
+    printf ("\n");
+
+    *(int*)input->value = 10;
+    TreapInsert (tree, 3, input);
+
+    PrintTreapInOrder (tree->root);
+    printf ("\n");
+
+    input = TreapValueDestructor (input);
 }
+
+// void
+// ExecuteRequests (treap* const tree,
+//                  const size_t requests_count)
+// {}
+
+
 
 int main (void)
 {
     srand (time (NULL));
 
-    treap* tree = TreapConstructor (key_cmp);
+    treap* tree = TreapConstructor ();
     assert (tree);
 
-    ExecuteRequests (tree);
+    size_t n = 0;
+    assert (scanf ("%zd", &n) == 1);
+    FillTreap (tree, n);
+
+
+
+    // size_t q = 0;
+    // assert (scanf ("%zd", &q) == 1);
+    // ExecuteRequests (tree, q);
 
     tree = TreapDestructor (tree);
     return 0;
