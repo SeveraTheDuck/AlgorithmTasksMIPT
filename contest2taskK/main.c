@@ -9,17 +9,10 @@
 //-----------------------------------------------------------------------------
 // Structs and types
 //-----------------------------------------------------------------------------
-typedef struct treap_value
-{
-    void*  value;
-    size_t size;  ///< size in bytes
-}
-treap_value;
-
 typedef struct treap_node
 {
-    int          priority;
-    treap_value* value;
+    int priority;
+    int value;
 
     size_t subtree_size;
 
@@ -78,23 +71,10 @@ TreapDestructorImpl (treap_node* const node);
 //-------------------------------------
 // Treap node constructor and destructor
 treap_node*
-TreapNodeConstructor (const treap_value* const value);
+TreapNodeConstructor (const int value);
 
 treap_node*
 TreapNodeDestructor  (treap_node* const node);
-//-------------------------------------
-
-//-------------------------------------
-// Treap value constructor, destructor and copy
-treap_value*
-TreapValueConstructor (const void* const value,
-                       const size_t size);
-
-treap_value*
-TreapValueDestructor  (treap_value* const value);
-
-treap_value*
-TreapValueCopy        (const treap_value* const value);
 //-------------------------------------
 
 //-------------------------------------
@@ -137,22 +117,13 @@ TreapFindImpl        (treap_node* const tree,
                       const size_t find_index);
 
 treap_error_t
-TreapInsert          (treap*             const tree,
-                      const size_t       insert_index,
-                      const treap_value* const value);
-
-treap_error_t
-TreapInsertImpl      (treap*             const tree,
-                      const size_t       insert_index,
-                      const treap_value* const value);
+TreapInsert          (treap* const tree,
+                      const size_t insert_index,
+                      const int    value);
 
 treap_error_t
 TreapDelete          (treap* const tree,
                       const size_t delete_index);
-
-treap_error_t
-TreapDeleteImpl      (treap*      const tree,
-                      treap_node* const found_node);
 
 treap_error_t
 TreapDeleteFoundNode (treap_pair* const pair,
@@ -204,14 +175,14 @@ TreapDestructorImpl (treap_node* const node)
 //-------------------------------------
 // Treap node constructor and destructor
 treap_node*
-TreapNodeConstructor (const treap_value* const value)
+TreapNodeConstructor (const int value)
 {
     treap_node* const node =
         (treap_node*) calloc (1, sizeof (treap_node));
     if (node == NULL) return NULL;
 
     node->priority     = rand ();
-    node->value        = TreapValueCopy (value);
+    node->value        = value;
     node->subtree_size = 1;
 
     return node;
@@ -220,53 +191,8 @@ TreapNodeConstructor (const treap_value* const value)
 treap_node*
 TreapNodeDestructor (treap_node* const node)
 {
-    if (node == NULL) return NULL;
-
-    node->value = TreapValueDestructor (node->value);
-
     free (node);
     return NULL;
-}
-//-------------------------------------
-
-//-------------------------------------
-// Treap value constructor, destructor and copy
-treap_value*
-TreapValueConstructor (const void* const value,
-                       const size_t size)
-{
-    treap_value* const new_value =
-        (treap_value*) calloc (1, sizeof (treap_value));
-    if (new_value == NULL) return NULL;
-
-    if (value != NULL && size != 0)
-    {
-        new_value->value = malloc (size);
-        if (new_value->value == NULL)
-            return TreapValueDestructor (new_value);
-
-        memcpy (new_value->value, value, size);
-        new_value->size = size;
-    }
-
-    return new_value;
-}
-
-treap_value*
-TreapValueDestructor (treap_value* const value)
-{
-    if (value == NULL) return NULL;
-
-    free (value->value);
-    free (value);
-    return NULL;
-}
-
-treap_value*
-TreapValueCopy (const treap_value* const value)
-{
-    if (value == NULL) return NULL;
-    return TreapValueConstructor (value->value, value->size);
 }
 //-------------------------------------
 
@@ -411,11 +337,9 @@ TreapFindImpl (treap_node* const tree,
 treap_error_t
 TreapInsert (treap* const tree,
              const size_t insert_index,
-             const treap_value* const value)
+             const int    value)
 {
-    if (tree  == NULL ||
-        value == NULL)
-        return TREAP_ERROR;
+    if (tree  == NULL) return TREAP_ERROR;
 
     treap_pair* const split_pair = TreapSplit (tree, insert_index);
     if (split_pair == NULL) return TREAP_ERROR;
@@ -522,7 +446,7 @@ PrintTreapInOrder (const treap_node* const node)
 
     printf ("(");
     PrintTreapInOrder (node->left);
-    printf ("%d ", *(int*)node->value->value);
+    printf ("%d ", node->value);
     PrintTreapInOrder (node->right);
     printf (")");
 }
@@ -536,34 +460,28 @@ FillTreap (treap* const tree,
 {
     assert (tree);
 
-    int temp = 0; // needed to allocate memory in TreapValueConstructor()
-    treap_value* input = TreapValueConstructor (&temp, sizeof (int));
-    assert (input);
+    int input = 0;
 
     for (size_t i = 0; i < elem_number; ++i)
     {
-        assert (scanf ("%d", (int*)input->value));
+        assert (scanf ("%d", &input) == 1);
         assert (TreapInsert (tree, i, input) == TREAP_SUCCESS);
     }
 
     PrintTreapInOrder (tree->root);
     printf ("\n");
 
-    *(int*)input->value = 10;
+    input = 10;
     TreapInsert (tree, 3, input);
 
     PrintTreapInOrder (tree->root);
     printf ("\n");
-
-    input = TreapValueDestructor (input);
 }
 
 // void
 // ExecuteRequests (treap* const tree,
 //                  const size_t requests_count)
 // {}
-
-
 
 int main (void)
 {
@@ -575,8 +493,6 @@ int main (void)
     size_t n = 0;
     assert (scanf ("%zd", &n) == 1);
     FillTreap (tree, n);
-
-
 
     // size_t q = 0;
     // assert (scanf ("%zd", &q) == 1);
