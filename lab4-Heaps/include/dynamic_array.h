@@ -77,7 +77,7 @@ struct dynamic_array
  * @param save_array Sets save_array field in struct.
  * @return Struct with filled fields.
 */
-struct dynamic_array*
+dynamic_array*
 DynamicArrayConstructor  (const size_t initial_data_array_capaity,
                           const size_t elem_size,
                           const bool enable_realloc,
@@ -90,8 +90,8 @@ DynamicArrayConstructor  (const size_t initial_data_array_capaity,
  * @param d_array Pointer to dynamic array struct.
  * @return NULL
 */
-struct dynamic_array*
-DynamicArrayDestructor   (struct dynamic_array* const d_array);
+dynamic_array*
+DynamicArrayDestructor   (dynamic_array* const d_array);
 
 /**
  * @brief Checks whether data_array needs realloc and calls DynamicArrayRealloc() if true.
@@ -100,7 +100,7 @@ DynamicArrayDestructor   (struct dynamic_array* const d_array);
  * @return Error status.
  */
 dynamic_array_error_t
-DynamicArrayReallocCheck (struct dynamic_array* const d_array);
+DynamicArrayReallocCheck (dynamic_array* const d_array);
 
 /**
  * @brief Reallocs data_array field up and down.
@@ -108,7 +108,7 @@ DynamicArrayReallocCheck (struct dynamic_array* const d_array);
  * @return Error status.
  */
 dynamic_array_error_t
-DynamicArrayRealloc      (struct dynamic_array* const d_array);
+DynamicArrayRealloc      (dynamic_array* const d_array);
 
 /**
  * @brief Pushes value from push_buffer in the end of the array.
@@ -118,8 +118,8 @@ DynamicArrayRealloc      (struct dynamic_array* const d_array);
  * @return Error status.
  */
 dynamic_array_error_t
-DynamicArrayPush         (struct dynamic_array* const d_array,
-                          const  void*          const push_buffer);
+DynamicArrayPush         (dynamic_array* const d_array,
+                          const void*    const push_buffer);
 
 /**
  * @brief Pops value from the end of the array.
@@ -128,7 +128,7 @@ DynamicArrayPush         (struct dynamic_array* const d_array,
  * @return Error status.
  */
 dynamic_array_error_t
-DynamicArrayPop          (struct dynamic_array* const d_array);
+DynamicArrayPop          (dynamic_array* const d_array);
 
 /**
  * @brief Gets pointer to element with given index.
@@ -137,7 +137,7 @@ DynamicArrayPop          (struct dynamic_array* const d_array);
  * @return Pointer to element. NULL if index is out of range.
  */
 void*
-DynamicArrayGetElemPtrByIndex (struct dynamic_array* const d_array,
-                               const  size_t elem_index);
+DynamicArrayGetElemPtrByIndex (dynamic_array* const d_array,
+                               const size_t elem_index);
 
 #endif /* DYNAMIC_ARRAY_H */

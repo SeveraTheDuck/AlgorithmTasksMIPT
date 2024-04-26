@@ -16,8 +16,9 @@ MakeDynamicFromRegularArray (int* const array,
     assert (array);
 
     dynamic_array* const d_array =
-        DynamicArrayConstructor(0, sizeof (int), DYNAMIC_ARRAY_REALLOC_DISABLED,
-                                                 DYNAMIC_ARRAY_DESTROY);
+        DynamicArrayConstructor (0, sizeof (int),
+                                 DYNAMIC_ARRAY_REALLOC_DISABLED,
+                                 DYNAMIC_ARRAY_DESTROY);
     assert (d_array);
 
     d_array->data_array          = array;

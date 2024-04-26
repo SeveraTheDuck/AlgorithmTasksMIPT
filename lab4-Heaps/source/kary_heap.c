@@ -8,15 +8,15 @@ const size_t K_HEAP_INITIAL_DATA_ARRAY_CAPACITY = 4;
 static void
 swap (void* elem1, void* elem2, const size_t elem_size);
 
-struct k_heap*
-KHeapConstructor (struct dynamic_array* d_array,
-                  const  size_t k,
-                  const  size_t elem_size,
-                  const  void* const infinity_value,
-                  int    (*comparator) (void*, void*))
+k_heap*
+KHeapConstructor (dynamic_array* d_array,
+                  const size_t k,
+                  const size_t elem_size,
+                  const void* const infinity_value,
+                  int (*comparator) (void*, void*))
 {
-    struct k_heap* heap =
-        (struct k_heap*) calloc (1, sizeof (struct k_heap));
+    k_heap* heap =
+        (k_heap*) calloc (1, sizeof (k_heap));
     if (heap == NULL) return NULL;
 
     heap->k = k;
@@ -49,8 +49,8 @@ KHeapConstructor (struct dynamic_array* d_array,
     return heap;
 }
 
-struct k_heap*
-KHeapDestructor (struct k_heap* const heap)
+k_heap*
+KHeapDestructor (k_heap* const heap)
 {
     if (heap == NULL) return NULL;
 
@@ -64,7 +64,7 @@ KHeapDestructor (struct k_heap* const heap)
 }
 
 k_heap_error_t
-KHeapSiftUp (struct k_heap* const heap,
+KHeapSiftUp (k_heap* const heap,
              const size_t key_index)
 {
     if (heap == NULL || key_index >= heap->d_array->data_array_size)
@@ -98,7 +98,7 @@ KHeapSiftUp (struct k_heap* const heap,
 }
 
 k_heap_error_t
-KHeapSiftDown (struct k_heap* const heap,
+KHeapSiftDown (k_heap* const heap,
                const size_t key_index)
 {
     if (heap == NULL || key_index >= heap->d_array->data_array_size)
@@ -136,8 +136,8 @@ KHeapSiftDown (struct k_heap* const heap,
 }
 
 k_heap_error_t
-KHeapInsert (struct k_heap* const heap,
-             const  void*   const insert_buffer)
+KHeapInsert (k_heap* const heap,
+             const void* const insert_buffer)
 {
     if (heap == NULL || insert_buffer == NULL)
         return K_HEAP_ERROR;
@@ -152,8 +152,8 @@ KHeapInsert (struct k_heap* const heap,
 }
 
 k_heap_error_t
-KHeapExtractRoot (struct k_heap* const heap,
-                         void*   const get_buffer)
+KHeapExtractRoot (k_heap* const heap,
+                  void*   const get_buffer)
 {
     if (heap == NULL)
         return K_HEAP_ERROR;
@@ -183,7 +183,7 @@ KHeapExtractRoot (struct k_heap* const heap,
 }
 
 k_heap_error_t
-KHeapDeleteKey (struct k_heap* const heap,
+KHeapDeleteKey (k_heap* const heap,
                 const size_t key_index)
 {
     if (heap == NULL || key_index >= heap->d_array->data_array_size)
@@ -203,7 +203,7 @@ KHeapDeleteKey (struct k_heap* const heap,
 }
 
 void*
-KHeapGetElemPtrByIndex (struct k_heap* const heap,
+KHeapGetElemPtrByIndex (k_heap* const heap,
                         const size_t key_index)
 {
     if (heap == NULL) return NULL;

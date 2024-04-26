@@ -24,38 +24,38 @@ struct k_heap
     struct dynamic_array* d_array;
 } k_heap;
 
-struct k_heap*
-KHeapConstructor (struct dynamic_array* d_array,
-                  const  size_t k,
-                  const  size_t elem_size,
-                  const  void* const infinity_value,
-                  int    (*comparator) (void*, void*));
+k_heap*
+KHeapConstructor (dynamic_array* d_array,
+                  const size_t k,
+                  const size_t elem_size,
+                  const void* const infinity_value,
+                  int (*comparator) (void*, void*));
 
-struct k_heap*
-KHeapDestructor (struct k_heap* const heap);
+k_heap*
+KHeapDestructor (k_heap* const heap);
 
 k_heap_error_t
-KHeapSiftUp (struct k_heap* const heap,
+KHeapSiftUp (k_heap* const heap,
              const size_t key_index);
 
 k_heap_error_t
-KHeapSiftDown (struct k_heap* const heap,
+KHeapSiftDown (k_heap* const heap,
                const size_t key_index);
 
 k_heap_error_t
-KHeapInsert (struct k_heap* const heap,
-             const  void*   const insert_buffer);
+KHeapInsert (k_heap* const heap,
+             const void* const insert_buffer);
 
 k_heap_error_t
-KHeapExtractRoot (struct k_heap* const heap,
-                         void*   const get_buffer);
+KHeapExtractRoot (k_heap* const heap,
+                  void*   const get_buffer);
 
 k_heap_error_t
-KHeapDeleteKey (struct k_heap* const heap,
+KHeapDeleteKey (k_heap* const heap,
                 const size_t key_index);
 
 void*
-KHeapGetElemPtrByIndex (struct k_heap* const heap,
+KHeapGetElemPtrByIndex (k_heap* const heap,
                         const size_t key_index);
 
 #endif /* K_HEAP_H */

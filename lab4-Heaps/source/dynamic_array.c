@@ -12,14 +12,14 @@ const char   DYNAMIC_ARRAY_POISON_BYTE = 0;
 static dynamic_array_error_t
 DynamicArrayCheck (struct dynamic_array* const d_array);
 
-struct dynamic_array*
+dynamic_array*
 DynamicArrayConstructor (const size_t initial_data_array_capaity,
                          const size_t elem_size,
                          const bool enable_realloc,
                          const bool save_array)
 {
-    struct dynamic_array* new_dynamic_array =
-        (struct dynamic_array*) calloc (1, sizeof (struct dynamic_array));
+    dynamic_array* const new_dynamic_array =
+        (dynamic_array*) malloc (sizeof (dynamic_array));
     if (new_dynamic_array == NULL)
         return NULL;
 
@@ -46,8 +46,8 @@ DynamicArrayConstructor (const size_t initial_data_array_capaity,
     return new_dynamic_array;
 }
 
-struct dynamic_array*
-DynamicArrayDestructor (struct dynamic_array* const d_array)
+dynamic_array*
+DynamicArrayDestructor (dynamic_array* const d_array)
 {
     if (d_array == NULL) return NULL;
 
@@ -55,16 +55,13 @@ DynamicArrayDestructor (struct dynamic_array* const d_array)
     if (d_array->data_array != NULL &&
         d_array->save_array == DYNAMIC_ARRAY_DESTROY)
     {
-        for (size_t i = 0; i < d_array->data_array_capacity; ++i)
-        {
-            memset (DynamicArrayGetElemPtrByIndex (d_array, i),
-                    DYNAMIC_ARRAY_POISON_BYTE, d_array->elem_size);
-        }
+        memset (d_array->data_array, DYNAMIC_ARRAY_POISON_BYTE,
+                d_array->data_array_size * d_array->elem_size);
 
         free (d_array->data_array);
     }
 
-    memset (d_array, DYNAMIC_ARRAY_POISON_BYTE, sizeof (struct dynamic_array));
+    memset (d_array, DYNAMIC_ARRAY_POISON_BYTE, sizeof (dynamic_array));
 
     free (d_array);
 
@@ -72,7 +69,7 @@ DynamicArrayDestructor (struct dynamic_array* const d_array)
 }
 
 dynamic_array_error_t
-DynamicArrayReallocCheck (struct dynamic_array* const d_array)
+DynamicArrayReallocCheck (dynamic_array* const d_array)
 {
     assert (d_array);
     assert (d_array->data_array);

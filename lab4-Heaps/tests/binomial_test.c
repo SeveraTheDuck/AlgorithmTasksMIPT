@@ -4,7 +4,7 @@
 
 
 clock_t
-BinomialHeapTest (int* const array,
+BinomialHeapTest (const int* const array,
                   const size_t elem_number)
 {
     assert (array);
@@ -23,6 +23,7 @@ BinomialHeapTest (int* const array,
 
     return end - begin;
 }
+
 
 
 int main (void)

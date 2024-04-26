@@ -1,5 +1,8 @@
+#pragma once
 #include <stdio.h>
 #include <time.h>
+
+
 
 enum int_cmp_status
 {
@@ -10,13 +13,13 @@ enum int_cmp_status
 
 
 
-int CompareInt (void* a, void* b)
+int CompareInt (const void* const a, const void* const b)
 {
     assert (a);
     assert (b);
 
-    int a_value = *(int*)a;
-    int b_value = *(int*)b;
+    const int a_value = *(const int*)a;
+    const int b_value = *(const int*)b;
 
     if (a_value < b_value) return INT_CMP_LESS;
     if (a_value > b_value) return INT_CMP_GREATER;

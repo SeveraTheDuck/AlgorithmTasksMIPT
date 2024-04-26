@@ -35,18 +35,18 @@ KHeapLinear (dynamic_array* const d_array)
 dynamic_array*
 ReadDynamicArray (const size_t elem_number)
 {
-    dynamic_array* array = DynamicArrayConstructor (elem_number, sizeof (int),
-                                                    DYNAMIC_ARRAY_REALLOC_ENABLED,
-                                                    DYNAMIC_ARRAY_DESTROY);
+    int* const array = ReadIntArray (elem_number);
     assert (array);
 
-    int input = 0;
+    dynamic_array* d_array =
+        DynamicArrayConstructor (0, sizeof (int),
+                                 DYNAMIC_ARRAY_REALLOC_DISABLED,
+                                 DYNAMIC_ARRAY_DESTROY);
+    assert (d_array);
 
-    for (size_t i = 0; i < elem_number; ++i)
-    {
-        assert (scanf ("%d", &input) == 1);
-        DynamicArrayPush (array, &input);
-    }
+    d_array->data_array          = array;
+    d_array->data_array_size     = elem_number;
+    d_array->data_array_capacity = elem_number;
 
     return array;
 }
@@ -62,7 +62,7 @@ int main (void)
     assert (d_array);
 
     printf ("%ld\n", KHeapLinear (d_array));
-    // array is being freed during KHeapLinear ()
+    // d_array is freed during KHeapLinear ()
 
     return 0;
 }
