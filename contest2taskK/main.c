@@ -15,6 +15,7 @@ typedef struct treap_node
     int value;
 
     size_t subtree_size;
+    int    subtree_sum;
 
     struct treap_node* left;
     struct treap_node* right;
@@ -98,12 +99,27 @@ TreapPairConstructor   (treap_node* const tree1,
 
 treap_pair*
 TreapPairDestructor    (treap_pair* const pair);
+//-------------------------------------
+
+//-------------------------------------
+// Update recursive parameters
+void
+TreapUpdateRecursiveParams (treap_node* const node);
 
 void
-TreapUpdateSubtreeSize (treap_node* const tree);
+TreapUpdateSubtreeSum      (treap_node* const node);
+
+void
+TreapUpdateSubtreeSize     (treap_node* const node);
+
+int
+TreapValue                 (const treap_node* const node);
+
+int
+TreapSum                   (const treap_node* const node);
 
 size_t
-TreapSize              (const treap_node* const tree);
+TreapSize                  (const treap_node* const node);
 //-------------------------------------
 
 //-------------------------------------
@@ -225,7 +241,7 @@ TreapSplitImpl (treap_node* const tree,
         pair = TreapSplitImpl (tree->right, new_split_index);
         tree->right = pair->tree1;
 
-        TreapUpdateSubtreeSize (tree);
+        TreapUpdateRecursiveParams (tree);
         pair->tree1 = tree;
 
         return pair;
@@ -236,7 +252,7 @@ TreapSplitImpl (treap_node* const tree,
         pair = TreapSplitImpl (tree->left, new_split_index);
         tree->left = pair->tree2;
 
-        TreapUpdateSubtreeSize (tree);
+        TreapUpdateRecursiveParams (tree);
         pair->tree2 = tree;
 
         return pair;
@@ -253,14 +269,14 @@ TreapMerge (treap_node* const tree1,
     if (tree1->priority <= tree2->priority)
     {
         tree2->left = TreapMerge (tree1, tree2->left);
-        TreapUpdateSubtreeSize (tree2);
+        TreapUpdateRecursiveParams (tree2);
         return tree2;
     }
 
     else
     {
         tree1->right = TreapMerge (tree1->right, tree2);
-        TreapUpdateSubtreeSize (tree1);
+        TreapUpdateRecursiveParams (tree1);
         return tree1;
     }
 }
@@ -285,19 +301,53 @@ TreapPairDestructor (treap_pair* const pair)
     free (pair);
     return NULL;
 }
+//-------------------------------------
+
+//-------------------------------------
+// Update recursive parameters
+void
+TreapUpdateRecursiveParams (treap_node* const node)
+{
+    if (node == NULL) return;
+
+    TreapUpdateSubtreeSum  (node);
+    TreapUpdateSubtreeSize (node);
+}
 
 void
-TreapUpdateSubtreeSize (treap_node* const tree)
+TreapUpdateSubtreeSum  (treap_node* const node)
 {
-    if (tree == NULL) return;
-    tree->subtree_size = 1 + TreapSize (tree->left) + TreapSize (tree->right);
+    node->subtree_sum = node->value +
+                        TreapSum (node->left) +
+                        TreapSum (node->right);
+}
+
+void
+TreapUpdateSubtreeSize (treap_node* const node)
+{
+    node->subtree_size = 1 + TreapSize (node->left) +
+                             TreapSize (node->right);
+}
+
+int
+TreapValue (const treap_node* const node)
+{
+    if (node == NULL) return 0;
+    return node->value;
+}
+
+int
+TreapSum (const treap_node* const node)
+{
+    if (node == NULL) return 0;
+    return node->subtree_sum;
 }
 
 size_t
-TreapSize (const treap_node* const tree)
+TreapSize (const treap_node* const node)
 {
-    if (tree == NULL) return 0;
-    return tree->subtree_size;
+    if (node == NULL) return 0;
+    return node->subtree_size;
 }
 //-------------------------------------
 
@@ -430,7 +480,7 @@ enum operation
     PREV_PERMUTATION = 7
 };
 
-typedef unsigned char operation_t;
+typedef unsigned int operation_t;
 //-------------------------------------
 
 //-------------------------------------
@@ -449,6 +499,70 @@ PrintTreapInOrder (const treap_node* const node)
     printf ("%d ", node->value);
     PrintTreapInOrder (node->right);
     printf (")");
+}
+
+void
+SumOperation (treap* const tree,
+              const size_t left_index,
+              const size_t right_index)
+{
+    assert (tree);
+
+    treap_pair* first_pair =
+        TreapSplit (tree, left_index);
+    assert (first_pair);
+
+    treap_pair* second_pair =
+        TreapSplitImpl (first_pair->tree2, right_index - left_index + 1);
+    assert (second_pair);
+
+    printf ("%d\n", TreapSum (second_pair->tree1));
+
+    tree->root = TreapMerge (first_pair->tree1,
+                 TreapMerge (second_pair->tree1, second_pair->tree2));
+
+    first_pair  = TreapPairDestructor (first_pair);
+    second_pair = TreapPairDestructor (second_pair);
+}
+
+void
+InsertOperation (treap* const tree)
+{
+    assert (tree);
+
+    int    value        = 0;
+    size_t insert_index = 0;
+
+    assert (scanf ("%d %zd", &value, &insert_index) == 2);
+    assert (TreapInsert (tree, insert_index, value) == TREAP_SUCCESS);
+}
+
+void
+DeleteOperation (treap* const tree)
+{
+    assert (tree);
+
+    size_t delete_index = 0;
+
+    assert (scanf ("%zd", &delete_index) == 1);
+    assert (TreapDelete (tree, delete_index) == TREAP_SUCCESS);
+}
+
+void
+SetValue (treap* const tree)
+{
+    assert (tree);
+
+    size_t left_index  = 0;
+    size_t right_index = 0;
+    int    value       = 0;
+
+    assert (scanf ("%d %zd %zd", &value, &left_index, &right_index) == 3);
+
+    treap_node* const found_node = TreapFind (tree, set_index);
+    if (found_node == NULL) return;
+
+    found_node->value = value;
 }
 //-------------------------------------
 
@@ -471,17 +585,58 @@ FillTreap (treap* const tree,
     PrintTreapInOrder (tree->root);
     printf ("\n");
 
-    input = 10;
-    TreapInsert (tree, 3, input);
-
-    PrintTreapInOrder (tree->root);
-    printf ("\n");
+//     input = 10;
+//     TreapInsert (tree, 3, input);
+//
+//     PrintTreapInOrder (tree->root);
+//     printf ("\n");
 }
 
-// void
-// ExecuteRequests (treap* const tree,
-//                  const size_t requests_count)
-// {}
+void
+ExecuteRequests (treap* const tree,
+                 const size_t requests_count)
+{
+    operation_t operation = 0;
+
+    for (size_t i = 0; i < requests_count; ++i)
+    {
+        assert (scanf ("%u", &operation) == 1);
+
+        switch (operation)
+        {
+            case SUM:
+                SumOperation (tree);
+                break;
+
+            case INSERT:
+                InsertOperation (tree);
+                break;
+
+            case DELETE:
+                DeleteOperation (tree);
+                break;
+
+            case SET_VALUE:
+                SetValueOperation (tree);
+                break;
+
+            case ADD_VALUE:
+                AddValueOperation (tree);
+                break;
+
+            case NEXT_PERMUTATION:
+                NextPermutationOperation (tree);
+                break;
+
+            case PREV_PERMUTATION:
+                PrevPermutationOperation (tree);
+                break;
+
+            default:
+                assert (0);
+        }
+    }
+}
 
 int main (void)
 {
@@ -494,9 +649,11 @@ int main (void)
     assert (scanf ("%zd", &n) == 1);
     FillTreap (tree, n);
 
-    // size_t q = 0;
-    // assert (scanf ("%zd", &q) == 1);
-    // ExecuteRequests (tree, q);
+    // SumOperation (tree, 0, 7);
+
+    size_t q = 0;
+    assert (scanf ("%zd", &q) == 1);
+    ExecuteRequests (tree, q);
 
     tree = TreapDestructor (tree);
     return 0;
