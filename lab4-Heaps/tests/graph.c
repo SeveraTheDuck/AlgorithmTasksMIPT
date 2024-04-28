@@ -10,7 +10,7 @@ GraphConstructor (const size_t vertex_num)
     if (graph == NULL) return NULL;
 
     graph->weight_table =
-        (weight_t**) malloc (vertex_num * vertex_num, sizeof (weight_t));
+        (weight_t**) malloc (vertex_num * vertex_num * sizeof (weight_t));
     if (graph->weight_table == NULL)
         return GraphDestructor (graph);
 
@@ -19,8 +19,8 @@ GraphConstructor (const size_t vertex_num)
     return graph;
 }
 
-graph_t
-GraphDestructor (graph_t const graph)
+graph_t*
+GraphDestructor (graph_t* const graph)
 {
     if (graph == NULL) return NULL;
 
@@ -29,13 +29,13 @@ GraphDestructor (graph_t const graph)
     return NULL;
 }
 
-graph_t
+graph_t*
 ReadGraph (void)
 {
     size_t vertex_num = 0;
     if (scanf ("%zu", &vertex_num) != 1) return NULL;
 
-    graph_t graph = GraphConstructor (vertex_num);
+    graph_t* graph = GraphConstructor (vertex_num);
     if (graph == NULL) return NULL;
 
     weight_t weight = 0;
@@ -47,11 +47,11 @@ ReadGraph (void)
             if (scanf ("%zu", &weight) != 1)
                 return GraphDestructor (graph);
 
-            graph[i * vertex_num + j] = weight;
-            graph[j * vertex_num + i] = weight;
+            graph->weight_table[i * vertex_num + j] = weight;
+            graph->weight_table[j * vertex_num + i] = weight;
         }
 
-        graph [i * vertex_num + i] = 0;
+        graph->weight_table[i * vertex_num + i] = 0;
     }
 
     return graph;

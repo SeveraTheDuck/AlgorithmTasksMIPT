@@ -20,10 +20,10 @@ graph_t;
 graph_t*
 GraphConstructor (const size_t vertex_num);
 
-graph_t
-GraphDestructor (graph_t const graph);
+graph_t*
+GraphDestructor (graph_t* const graph);
 
-graph_t
+graph_t*
 ReadGraph (void);
 
 weight_t*

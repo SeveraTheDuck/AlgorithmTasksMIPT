@@ -1,4 +1,4 @@
-#include "kary_heap.h"
+#include "../include/kary_heap.h"
 #include "common.h"
 #include <limits.h>
 
@@ -44,9 +44,9 @@ ReadDynamicArray (const size_t elem_number)
                                  DYNAMIC_ARRAY_DESTROY);
     assert (d_array);
 
-    d_array->data_array          = array;
-    d_array->data_array_size     = elem_number;
-    d_array->data_array_capacity = elem_number;
+    d_array->array      = array;
+    d_array->array_size = elem_number;
+    d_array->capacity   = elem_number;
 
     return array;
 }
