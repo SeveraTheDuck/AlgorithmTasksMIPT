@@ -1,10 +1,10 @@
 #ifndef DYNAMIC_ARRAY_H
 #define DYNAMIC_ARRAY_H
 
+#include <assert.h>
+#include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdbool.h>
-#include <assert.h>
 
 /* How many times to increase or decrease the capacity of dynamic array */
 extern const size_t DYNAMIC_ARRAY_RESIZE_MULTIPLIER;
@@ -59,14 +59,14 @@ typedef int dynamic_array_error_t;
 typedef
 struct dynamic_array
 {
-    void* data_array;           ///< Pointer to array with all elements.
-    size_t elem_size;           ///< Size of each element in bytes.
+    void*  array;           ///< Pointer to array with all elements.
+    size_t elem_size;       ///< Size of each element in bytes.
 
-    size_t data_array_size;     ///< Number of elements.
-    size_t data_array_capacity; ///< Current max number of elements in array.
+    size_t array_size;      ///< Number of elements.
+    size_t capacity;        ///< Current max number of elements in array.
 
-    bool enable_realloc;        ///< Enable or disable realloc during push/pop.
-    bool save_array;            ///< Save or destroy data_array in DynamicArrayDestructor().
+    bool enable_realloc;    ///< Enable or disable realloc during push/pop.
+    bool save_array;        ///< Save or destroy data_array in DynamicArrayDestructor().
 } dynamic_array;
 
 /**
@@ -80,8 +80,8 @@ struct dynamic_array
 dynamic_array*
 DynamicArrayConstructor  (const size_t initial_data_array_capaity,
                           const size_t elem_size,
-                          const bool enable_realloc,
-                          const bool save_array);
+                          const bool   enable_realloc,
+                          const bool   save_array);
 
 /**
  * @brief Destroys the struct and clear its fields.
@@ -94,7 +94,7 @@ dynamic_array*
 DynamicArrayDestructor   (dynamic_array* const d_array);
 
 /**
- * @brief Checks whether data_array needs realloc and calls DynamicArrayRealloc() if true.
+ * @brief Checks whether array needs realloc and calls DynamicArrayRealloc() if true.
  * Does nothing if enable_realloc == DYNAMIC_ARRAY_REALLOC_DISABLED
  * @param d_array Pointer to dynamic array struct.
  * @return Error status.

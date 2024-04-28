@@ -1,4 +1,4 @@
-#include "kary_heap.h"
+#include "../include/kary_heap.h"
 #include <stdio.h>
 
 const size_t K_HEAP_NULL_SIZE  = 0;
@@ -40,7 +40,7 @@ KHeapConstructor (dynamic_array* d_array,
     {
         heap->d_array = d_array;
 
-        for (size_t i = d_array->data_array_size / heap->k; i > 0; --i)
+        for (size_t i = d_array->array_size / heap->k; i > 0; --i)
             KHeapSiftDown (heap, i);
 
         KHeapSiftDown (heap, K_HEAP_ROOT_INDEX);
@@ -67,7 +67,7 @@ k_heap_error_t
 KHeapSiftUp (k_heap* const heap,
              const size_t key_index)
 {
-    if (heap == NULL || key_index >= heap->d_array->data_array_size)
+    if (heap == NULL || key_index >= heap->d_array->array_size)
         return K_HEAP_ERROR;
 
     size_t  cur_index  = key_index;
@@ -101,7 +101,7 @@ k_heap_error_t
 KHeapSiftDown (k_heap* const heap,
                const size_t key_index)
 {
-    if (heap == NULL || key_index >= heap->d_array->data_array_size)
+    if (heap == NULL || key_index >= heap->d_array->array_size)
         return K_HEAP_ERROR;
 
     size_t cur_index = key_index;
@@ -113,7 +113,7 @@ KHeapSiftDown (k_heap* const heap,
     for (size_t i = 0; i < heap->k; ++i)
     {
         cur_child_ptr = KHeapGetElemPtrByIndex (heap, cur_child);
-        if (cur_child_ptr == NULL || cur_child >= heap->d_array->data_array_size)
+        if (cur_child_ptr == NULL || cur_child >= heap->d_array->array_size)
             break;
 
         if (heap->cmp (cur_ptr, cur_child_ptr) < 0)
@@ -145,7 +145,7 @@ KHeapInsert (k_heap* const heap,
     if (DynamicArrayPush (heap->d_array, insert_buffer) == DYNAMIC_ARRAY_ERROR)
         return K_HEAP_ERROR;
 
-    if (KHeapSiftUp (heap, heap->d_array->data_array_size - 1) == K_HEAP_ERROR)
+    if (KHeapSiftUp (heap, heap->d_array->array_size - 1) == K_HEAP_ERROR)
         return K_HEAP_ERROR;
 
     return K_HEAP_SUCCESS;
@@ -162,9 +162,7 @@ KHeapExtractRoot (k_heap* const heap,
         (heap, K_HEAP_ROOT_INDEX);
 
     void* const last_ptr = KHeapGetElemPtrByIndex
-        (heap, heap->d_array->data_array_size - 1);
-
-    // fprintf (stderr, "LAST_PTR %d\n", *(int*)last_ptr);
+        (heap, heap->d_array->array_size - 1);
 
     if (root_ptr == NULL || last_ptr == NULL) return K_HEAP_ERROR;
 
@@ -186,7 +184,7 @@ k_heap_error_t
 KHeapDeleteKey (k_heap* const heap,
                 const size_t key_index)
 {
-    if (heap == NULL || key_index >= heap->d_array->data_array_size)
+    if (heap == NULL || key_index >= heap->d_array->array_size)
         return K_HEAP_ERROR;
 
     // a[key_index] = inf;
@@ -217,7 +215,7 @@ swap (void* elem1, void* elem2, const size_t elem_size)
     assert (elem1);
     assert (elem2);
 
-    void* tmp_elem = calloc (1, elem_size);
+    void* tmp_elem = malloc (elem_size);
     assert (tmp_elem);
 
     memcpy (tmp_elem, elem2,    elem_size);
