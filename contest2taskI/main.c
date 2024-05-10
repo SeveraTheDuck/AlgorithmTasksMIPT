@@ -10,111 +10,297 @@ const size_t STRING_MAX_LEN = 0x400;
 
 
 
-//-----------------------------------------------------------------------------
-// Splay tree structs and types
-//-----------------------------------------------------------------------------
+/******************************************************************************
+ * @name Splay tree structs and types.
+ * 
+ * @{
+ ******************************************************************************/
+/**
+ * @brief Splay key structure.
+ * 
+ * A container for key of the node.
+ */
 typedef struct splay_key
 {
-    void*  key;
-    size_t key_len;
+    void*  key;                                 ///< buffer for the key
+    size_t key_len;                             ///< size of the key buffer in bytes
 }
 splay_key;
 
+/**
+ * @brief Splay value structure.
+ * 
+ * A container for value of the node.
+ */
 typedef struct splay_value
 {
-    void*  value;
-    size_t value_len;
+    void*  value;                               ///< buffer for the value
+    size_t value_len;                           ///< size of the value buffer in bytes
 }
 splay_value;
 
+/**
+ * @brief Splay node structure.
+ * 
+ * A container for node and its information.
+ * Includes key and value fields and pointers to child nodes and parent node.
+ */
 typedef struct splay_node
 {
-    splay_key*         key;
-    splay_value*       value;
-    struct splay_node* left;
-    struct splay_node* right;
-    struct splay_node* parent;
+    splay_key*         key;                     ///< key structure
+    splay_value*       value;                   ///< value structure
+    struct splay_node* left;                    ///< pointer to the left child node
+    struct splay_node* right;                   ///< pointer to the right child node
+    struct splay_node* parent;                  ///< pointer to the parent node
 }
 splay_node;
 
+/**
+ * @brief Splay tree structure.
+ * 
+ * Includes pointer to the root node and pointer to key comparator function.
+ */
 typedef struct splay_tree
 {
-    splay_node* root;
-    int (*key_cmp) (const splay_key* const,
+    splay_node* root;                           ///< pointer to the root node
+    int (*key_cmp) (const splay_key* const,     ///< key comparator function
                     const splay_key* const);
 }
 splay_tree;
 
+/**
+ * @brief Splay tree errors enumeration.
+ * 
+ * List of possible error codes, including no-error status.
+ */
 enum splay_errors
 {
-    SPLAY_TREE_SUCCESS = 0,
-    SPLAY_TREE_ERROR   = 1
+    SPLAY_TREE_SUCCESS = 0,                     ///< no error occured during function
+    SPLAY_TREE_ERROR   = 1                      ///< error occured during function
 };
 
+/**
+ * @brief Splay tree error type.
+ * 
+ * Return type for functions error codes.
+ */
 typedef size_t splay_error_t;
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
+
+/******************************************************************************
+ * @}
+ ******************************************************************************/
 
 
 
-//-----------------------------------------------------------------------------
-// Splay tree functions' prototypes
-//-----------------------------------------------------------------------------
+/******************************************************************************
+ * @name Splay tree functions prototypes
+ * 
+ * @{
+ ******************************************************************************/
 //-------------------------------------
-// Splay tree constructor and destructor
+// Splay tree constructor and destructor.
+//-------------------------------------
+/**
+ * @brief Splay tree constructor.
+ * 
+ * @param[in] key_cmp key comparator function.
+ * 
+ * @retval Pointer to the allocated structure.
+ * @retval NULL if allocation error occurred.
+ * 
+ * Allocates memory for the splay_tree structure and fills its
+ * key_cmp field with given compare function.
+ */
 splay_tree*
 SplayTreeConstructor (int (*key_cmp) (const splay_key* const,
                                       const splay_key* const));
 
+/**
+ * @brief Splay tree destructor.
+ * 
+ * @param[in] tree Pointer to the tree to destroy.
+ * 
+ * @retval NULL in all cases.
+ * 
+ * Destroys all nodes using SplayTreeDeleteKey() and frees allocated memory.
+ */
 splay_tree*
-SplayTreeDestructor  (splay_tree* const tree);
+SplayTreeDestructor (splay_tree* const tree);
 //-------------------------------------
 
 //-------------------------------------
-// Splay node constructor and destructor
+// Splay node constructor and destructor.
+//-------------------------------------
+/**
+ * @brief Splay node constructor.
+ * 
+ * @param[in] key   structure of the key   to copy. No copying if NULL is given.
+ * @param[in] value structure of the value to copy. No copying if NULL is given.
+ * 
+ * @retval Pointer to the allocated structure.
+ * @retval NULL if allocation error occurred.
+ * 
+ * Allocates memory for the splay_node structure and fills its
+ * key and value fields with given structures.
+ * Key and value are being copied using SplayKeyCopy() and SplayValueCopy() functions.
+ */
 splay_node*
 SplayNodeConstructor (const splay_key*   const key,
                       const splay_value* const value);
 
+/**
+ * @brief Splay node destructor.
+ * 
+ * @param[in] node a node to destroy.
+ * @retval NULL in all cases.
+ * 
+ * Calls for key and value destructors and frees allocated memory.
+ */
 splay_node*
 SplayNodeDestructor  (splay_node* const node);
 //-------------------------------------
 
 //-------------------------------------
-// Splay key and value constructor, destructor and copy
+// Splay key and value constructor, destructor and copy.
+//-------------------------------------
+/**
+ * @brief Splay key constructor
+ * 
+ * @param[in] key buffer of the key.
+ * @param[in] key_len buffer length.
+ * 
+ * @retval Pointer to the allocated structure.
+ * @retval NULL if allocation error occurred.
+ * 
+ * Allocates memory for the splay_key structure.
+ * Allocates key_len bytes for a new buffer and
+ * copies key_len bytes from the given buffer.
+ * If buffer is NULL or key_len is 0, only allocates splay_key structure.
+ */
 splay_key*
-SplayKeyConstructor   (const void* const key,
-                       const size_t key_len);
+SplayKeyConstructor (const void* const key,
+                     const size_t key_len);
 
+/**
+ * @brief Copies key from the given one.
+ * 
+ * @param[in] key splay_key structure to copy.
+ * 
+ * @retval Pointer to the allocated structure.
+ * @retval NULL if allocation error occurred.
+ * 
+ * Calls for SplayKeyConstructor (key->key, key->value).
+ */
 splay_key*
-SplayKeyCopy          (const splay_key* const key);
+SplayKeyCopy (const splay_key* const key);
 
+/**
+ * @brief Splay key destructor.
+ * 
+ * @param[in] key splay_key structure to destroy.
+ * 
+ * @retval NULL in all cases.
+ * 
+ * Frees buffer inside the structure.
+ * Frees given splay_key structure.
+ */
 splay_key*
-SplayKeyDestructor    (splay_key* const key);
+SplayKeyDestructor (splay_key* const key);
 
+/**
+ * @brief Splay value constructor.
+ * 
+ * @param[in] value buffer of the value.
+ * @param[in] value_len buffer length.
+ * 
+ * @retval Pointer to the allocated structure.
+ * @retval NULL if allocation error occurred.
+ * 
+ * @see SplayKeyConstructor(). Same thing but for splay_value.
+ */
 splay_value*
 SplayValueConstructor (const void* const value,
                        const size_t value_len);
 
+/**
+ * @brief Copies value from the given one.
+ * 
+ * @param[in] value splay_value structure to copy.
+ * 
+ * @retval Pointer to the allocated structure.
+ * @retval NULL if allocation error occurred.
+ * 
+ * @see SplayKeyCopy(). Same thing but for splay_value.
+ */
 splay_value*
-SplayValueCopy        (const splay_value* const value);
+SplayValueCopy (const splay_value* const value);
 
+/**
+ * @brief Splay value destructor.
+ * 
+ * @param[in] value splay_value structure to destroy.
+ * 
+ * @retval NULL in all cases.
+ * 
+ * @see SplayKeyDestructor(). Same thing but for splay_value.
+ */
 splay_value*
-SplayValueDestructor  (splay_value* const value);
+SplayValueDestructor (splay_value* const value);
 //-------------------------------------
 
 //-------------------------------------
 // Insert functions
+//-------------------------------------
+/**
+ * @brief Splay tree insert function.
+ * 
+ * @param[in] tree  splay_tree structure to insert into.
+ * @param[in] key   splay_key   to insert.
+ * @param[in] value splay_value to insert.
+ * 
+ * @retval SPLAY_TREE_ERROR   if error occured.
+ * @retval SPLAY_TREE_SUCCESS otherwise.
+ * 
+ * If tree has no root, calls for SplayInsertRoot() function, returns its status.
+ * Calls for SplayTreeInsertImpl() otherwise.
+ * Calls for Splay function in the end to keep new node in the root.
+ */
 splay_error_t
-SplayTreeInsert     (splay_tree*        const tree,
-                     const splay_key*   const key,
-                     const splay_value* const value);
+SplayTreeInsert (splay_tree*        const tree,
+                 const splay_key*   const key,
+                 const splay_value* const value);
 
+/**
+ * @brief Splay tree insert root function.
+ * 
+ * @param[in] tree  splay_tree structure to insert into.
+ * @param[in] key   splay_key to insert.
+ * @param[in] value splay_value to insert.
+ * 
+ * @retval SPLAY_TREE_ERROR   if error occured.
+ * @retval SPLAY_TREE_SUCCESS otherwise.
+ * 
+ * Constructs a new node via key-value parameters and inserts it into the tree root.
+ */
 splay_error_t
-SplayInsertRoot     (splay_tree*        const tree,
-                     const splay_key*   const key,
-                     const splay_value* const value);
+SplayInsertRoot (splay_tree*        const tree,
+                 const splay_key*   const key,
+                 const splay_value* const value);
 
+/**
+ * @brief Splay tree insert implementation function.
+ * 
+ * @param[in] tree  splay_tree structure to insert into.
+ * @param[in] key   splay_key to insert.
+ * @param[in] value splay_value to insert.
+ * 
+ * @retval pointer to the new node.
+ * @retval NULL if error occured.
+ * 
+ * Constructs a new node via key-value parameters.
+ * Searches for a place to insert new node via comparator function from the tree.
+ * Search implementation is similar to naive BST.
+ */
 splay_node*
 SplayTreeInsertImpl (splay_tree*        const tree,
                      const splay_key *  const key,
@@ -123,17 +309,57 @@ SplayTreeInsertImpl (splay_tree*        const tree,
 
 //-------------------------------------
 // Delete functions
+//-------------------------------------
+/**
+ * @brief Splay tree delete by key function.
+ * 
+ * @param[in] tree splay_tree structure to delete from.
+ * @param[in] key  splay_key to find the node to delete.
+ * 
+ * @retval SPLAY_TREE_ERROR   if error occured.
+ * @retval SPLAY_TREE_SUCCESS otherwise.
+ * 
+ * Searches for the node to delete using SplayTreeFind() function.
+ * If no node found, returns SPLAY_TREE_ERROR.
+ * Otherwise, after SplayTreeFind() function the node is located in the root.
+ * Replaces it with the node from SplayFindMaxKey()
+ * and deletes the node using SplayNodeDestructor() function.
+ */
 splay_error_t
 SplayTreeDeleteKey (splay_tree*      const tree,
                     const splay_key* const key);
 
+/**
+ * @brief Splay tree find max key function.
+ * 
+ * @param[in] tree splay_tree structure to find the node.
+ * 
+ * @retval pointer to the node.
+ * @retval NULL if tree is empty.
+ * 
+ * The function searches for the max possible key value (goes to the right subtree).
+ * Calls for Splay() function from the found node to place it in the root.
+*/
 splay_node*
-SplayFindMaxKey    (splay_tree* const tree);
+SplayFindMaxKey (splay_tree* const tree);
 //-------------------------------------
 
 
 //-------------------------------------
-// Find functions
+// Find functions.
+//-------------------------------------
+/**
+ * @brief Splay tree find by key function.
+ * 
+ * @param[in] tree splay_tree structure to find the node.
+ * @param[in] key  splay_key  structure to compare to.
+ * 
+ * @retval pointer to the node, NULL if not found.
+ * 
+ * The function searches for the node with equal key
+ * using key_cmp function from the tree structure.
+ * Calls for Splay() function from the found node to place it in the root.
+*/
 splay_node*
 SplayTreeFind (splay_tree*      const tree,
                const splay_key* const key);
@@ -141,42 +367,168 @@ SplayTreeFind (splay_tree*      const tree,
 
 //-------------------------------------
 // Splay and rotate functions
+//-------------------------------------
+/**
+ * @brief Splay function
+ * 
+ * @param[in] tree splay_tree structure where the node is located.
+ * @param[in] node splay_node structure to place in the root.
+ * 
+ * Splay function performs several possible rotations
+ * to place the given node in the root of the tree
+ * The rotations depend on the node's parent and grand parent position.
+ * Three rotations are possible: zig, zig-zig and zig-zag.
+ */
 void
-Splay            (splay_tree* const tree,
-                  splay_node* const node);
+Splay (splay_tree* const tree,
+       splay_node* const node);
 
+/**
+ * @brief Zig rotation of the node.
+ * 
+ * @param[in] node the node to rotate.
+ * 
+ * This rotation may occure only once for the Splay cycle.
+ * It is called if the node's parent is the tree's root.
+ * It calls for SplayRotateLeft() or SplayRotateRight() functions.
+ * Right rotation example to place node n in the root:
+ * 
+ *     p              n
+ *    / \            / \
+ *   n   c   =>     a   p
+ *  / \                / \
+ * a   b              b   c
+ * 
+ */
 void
-SplayZig         (splay_node* const node);
+SplayZig (splay_node* const node);
 
+/**
+ * @brief Zig-zig rotation of the node.
+ * 
+ * @param[in] node the node to rotate.
+ * 
+ * This rotation is called when node and its parent are
+ * both right children or both left children.
+ * Firstly, calls for rotate function around the parent node,
+ * then around the given node.
+ * Left children case:
+ * 
+ *       g               p              n
+ *      / \             / \            / \
+ *     p   d           /   g          a   p
+ *    / \             /   / \            / \
+ *   n   c     =>    n   c   d   =>     b   g
+ *  / \             / \                    / \
+ * a   b           a   b                  c   d
+ * 
+ */
 void
-SplayZigZig      (splay_node* const node);
+SplayZigZig (splay_node* const node);
 
+/**
+ * @brief Zig-zag rotation of the node.
+ * 
+ * @param[in] node the node to rotate.
+ * 
+ * This rotation is called when node and its parent are
+ * different children, one is right and the other is left.
+ * Calls for two rotations around the given node.
+ * Example:
+ * 
+ *       g              g                    n
+ *      / \            / \                  / \
+ *     p   d          n   d                /   g
+ *    / \            / \                  /   / \
+ *   a   n     =>   p   c      =>        p   c   d
+ *      / \        / \                  / \
+ *     b   c      a   b                a   b
+ * 
+ */
 void
-SplayZigZag      (splay_node* const node);
+SplayZigZag (splay_node* const node);
 
+/**
+ * @brief Left rotation around the given node.
+ * 
+ * @param[in] node the node to rotate around.
+ * 
+ * Makes node's parent its left child.
+ */
 void
-SplayRotateLeft  (splay_node* const node);
+SplayRotateLeft (splay_node* const node);
 
+/**
+ * @brief Right rotation around the given node.
+ * 
+ * @param[in] node the node to rotate around.
+ * 
+ * Makes node's parent its right child.
+ */
 void
 SplayRotateRight (splay_node* const node);
 //-------------------------------------
 
 //-------------------------------------
-// Little helper functions
+// Little helper functions.
+//-------------------------------------
+/**
+ * @brief Get node's parent pointer.
+ * 
+ * @param[in] node the node to get parent from.
+ * 
+ * @retval pointer to the node's parent.
+ * @retval NULL if node == NULL or parent doesn't exist.
+ * 
+ * Returns node->parent.
+ */
 splay_node*
-SplayGetParent      (const splay_node* const node);
+SplayGetParent (const splay_node* const node);
 
+/**
+ * @brief Get node's grandparent pointer.
+ * 
+ * @param[in] node the node to get parent from.
+ * 
+ * @retval pointer to the node's grandparent.
+ * @retval NULL if node == NULL or grandparent doesn't exist.
+ * 
+ * SplayGetParent (SplayGetParent (node));
+ */
 splay_node*
 SplayGetGrandParent (const splay_node* const node);
 
+/**
+ * @brief Checks whether the node is right child.
+ * 
+ * @param[in] node the node to check.
+ * 
+ * @retval true  if the node is right child.
+ * @retval false if node == NULL, node's parent doesn't exist or it is left child.
+ * 
+ * Gets the node's parent and checks whether the node is its right child.
+ * Returns boolean value.
+ */
 bool
-SplayIsRightChild   (const splay_node* const node);
+SplayIsRightChild (const splay_node* const node);
 
+/**
+ * @brief Checks whether the node is left child.
+ * 
+ * @param[in] node the node to check.
+ * 
+ * @retval true  if the node is left child.
+ * @retval false if node == NULL, node's parent doesn't exist or it is right child.
+ * 
+ * Gets the node's parent and checks whether the node is its left child.
+ * Returns boolean value.
+ */
 bool
-SplayIsLeftChild    (const splay_node* const node);
+SplayIsLeftChild (const splay_node* const node);
 //-------------------------------------
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
+/******************************************************************************
+ * @}
+ ******************************************************************************/
 
 
 
@@ -403,6 +755,7 @@ SplayTreeDeleteKey (splay_tree*      const tree,
 
     splay_node* const del_node = SplayTreeFind (tree, key);
     if (del_node == NULL) return SPLAY_TREE_ERROR;
+
     splay_node* const prev_right = tree->root->right;
     splay_node* const prev_left  = tree->root->left;
 
@@ -749,3 +1102,5 @@ int main (void)
     rev_tree = SplayTreeDestructor (rev_tree);
     return 0;
 }
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
