@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <ctype.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -6,7 +7,337 @@
 
 
 
-const size_t STRING_MAX_LEN = 0x400;
+//-----------------------------------------------------------------------------
+// Dynamic array struct
+//-----------------------------------------------------------------------------
+const size_t DYNAMIC_ARRAY_RESIZE_MULTIPLIER = 2;
+
+typedef bool d_array_realloc_status_t;
+
+/**
+ * @brief Dynamic array structure
+ */
+typedef struct dynamic_array
+{
+    void*  data;            ///< Pointer to array with data
+    size_t size;            ///< Current nuumber of elements in the array
+    size_t capacity;        ///< Current capacity of the array
+    size_t element_size;    ///< Size of each element in the array in bytes
+}
+d_array_t;
+
+/**
+ * @brief Dynamic array error statuses
+ */
+enum d_array_errors
+{
+    DYNAMIC_ARRAY_SUCCESS = 0,  ///< No errors occurred, success
+    DYNAMIC_ARRAY_ERROR   = 1   ///< Error occurred
+};
+
+typedef size_t d_array_error_t;
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+
+
+
+//-----------------------------------------------------------------------------
+// Static functions prototypes
+//-----------------------------------------------------------------------------
+//-------------------------------------
+// Realloc functions
+static d_array_error_t
+DynamicArrayRealloc (d_array_t* const array);
+
+static d_array_realloc_status_t
+DynamicArrayCheckRealloc (d_array_t* const array);
+
+static d_array_error_t
+DynamicArrayExecuteRealloc (d_array_t* const array);
+//-------------------------------------
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+
+
+
+//-----------------------------------------------------------------------------
+// Dynamic array functions' prototypes
+//-----------------------------------------------------------------------------
+//-------------------------------------
+// Constructor and destructor
+/**
+ * @brief Constructor for dynamic array structure
+ * 
+ * @param element_size size of each element in bytes
+ * 
+ * @return pointer to the structure if success, NULL if error
+ * 
+ * Allocates memory for the dynamic array structure, initializes and returns it.
+ * array->data field is NULL at this point.
+ */
+d_array_t*
+DynamicArrayConstructor       (const size_t element_size);
+
+/**
+ * @brief Destructor for dynamic array structure
+ * 
+ * @param array pointer to dynamic array structure
+ * 
+ * @return NULL
+ * 
+ * If array == NULL, returns NULL.
+ * Otherwise, frees array->data field and array itself.
+ */
+d_array_t*
+DynamicArrayDestructor        (d_array_t* const array);
+//-------------------------------------
+
+//-------------------------------------
+// Interface
+/**
+ * @brief Push function with reallocation of array
+ * 
+ * @param array pointer to dynamic array structure
+ * @param element pointer to element buffer to push
+ * 
+ * @return DYNAMIC_ARRAY_SUCCESS on success, DYNAMIC_ARRAY_ERROR on error
+ * 
+ * 1. Calls for DynamicArrayRealloc() function to check and perform realloc if needed
+ * 2. Calls for DynamicArrayPushNoRealloc() function after that to perform push operation
+ */
+d_array_error_t
+DynamicArrayPush              (d_array_t*  const array,
+                               const void* const element);
+
+/**
+ * @brief Push function without reallocation of array
+ * 
+ * @param array pointer to dynamic array structure
+ * @param element pointer to element buffer to push
+ * 
+ * @return DYNAMIC_ARRAY_SUCCESS on success, DYNAMIC_ARRAY_ERROR on error
+ * 
+ * Does nothing if array->size == array->capacity, returns DYNAMIC_ARRAY_ERROR status.
+ * Otherwise, copies value of array->element_size bytes from element buffer
+ * to the end of array. Increases array->size.
+ */
+d_array_error_t
+DynamicArrayPushNoRealloc     (d_array_t* const array,
+                               const void* const element);
+                  
+/**
+ * @brief Pop function with reallocation of array
+ * 
+ * @param array pointer to dynamic array structure
+ * 
+ * @return DYNAMIC_ARRAY_SUCCESS on success, DYNAMIC_ARRAY_ERROR on error
+ * 
+ * 1. Calls for DynamicArrayPopNoRealloc() function to perform pop operation
+ * 2. Calls for DynamicArrayRealloc() function to check and perform realloc if needed
+ */
+d_array_error_t
+DynamicArrayPop               (d_array_t* const array);
+
+/**
+ * @brief Pop function without reallocation of array
+ * 
+ * @param array pointer to dynamic array structure
+ *
+ * @return DYNAMIC_ARRAY_SUCCESS on success, DYNAMIC_ARRAY_ERROR on error
+ * 
+ * Does nothing if array->size == 0, returns DYNAMIC_ARRAY_ERROR status.
+ * Otherwise, decreases array->size.
+ */
+d_array_error_t
+DynamicArrayPopNoRealloc      (d_array_t* const array);
+
+/**
+ * @brief Gets pointer to the element of the dynamic array by its index
+ * 
+ * @param array pointer to dynamic array structure
+ * 
+ * @return pointer on success, NULL on error
+ * 
+ * Returns NULL if index out of range.
+ * Otherwise, returns pointer to the element with void* pointer type.
+ */
+void*
+DynamicArrayGetElemPtrByIndex (d_array_t* const array,
+                               const size_t index);
+//-------------------------------------
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+
+
+
+//-----------------------------------------------------------------------------
+// Dynamic array functions' prototypes
+//-----------------------------------------------------------------------------
+//-------------------------------------
+// Constructor and destructor
+d_array_t*
+DynamicArrayConstructor (const size_t element_size)
+{
+    d_array_t* const array = (d_array_t*) calloc(1, sizeof(d_array_t));
+    if (array == NULL)
+        return NULL;
+
+    array->element_size = element_size;
+    array->size         = 0;
+    array->capacity     = 0;
+
+    return array;
+}
+
+d_array_t*
+DynamicArrayDestructor (d_array_t* const array)
+{
+    if (array == NULL)
+        return NULL;
+
+    free(array->data);
+    free(array);
+
+    return NULL;
+}
+//-------------------------------------
+
+//-------------------------------------
+// Interface
+d_array_error_t
+DynamicArrayPush (d_array_t*  const array,
+                  const void* const element)
+{
+    if (array   == NULL ||
+        element == NULL)
+        return DYNAMIC_ARRAY_ERROR;
+
+    d_array_error_t error_status = DYNAMIC_ARRAY_SUCCESS;
+
+    error_status = error_status || DynamicArrayRealloc (array);
+
+    error_status = error_status || DynamicArrayPushNoRealloc (array, element);
+
+    return error_status;
+}
+
+d_array_error_t
+DynamicArrayPushNoRealloc (d_array_t*  const array,
+                           const void* const element)
+{
+    if (array       == NULL ||
+        array->size == array->capacity)
+        return DYNAMIC_ARRAY_ERROR;
+
+    void* const push_ptr = DynamicArrayGetElemPtrByIndex (array, array->size);
+    if (push_ptr == NULL)
+        return DYNAMIC_ARRAY_ERROR;
+
+    memcpy (push_ptr, element, array->element_size);
+    ++array->size;
+
+    return DYNAMIC_ARRAY_SUCCESS;
+}
+
+d_array_error_t
+DynamicArrayPop (d_array_t* const array)
+{
+    d_array_error_t error_status = DYNAMIC_ARRAY_SUCCESS;
+
+    error_status = error_status || DynamicArrayPopNoRealloc (array);
+
+    error_status = error_status || DynamicArrayRealloc (array);
+
+    return error_status;
+}
+
+d_array_error_t
+DynamicArrayPopNoRealloc (d_array_t* const array)
+{
+    if (array       == NULL ||
+        array->size == 0)
+        return DYNAMIC_ARRAY_ERROR;
+
+    --array->size;
+
+    return DYNAMIC_ARRAY_SUCCESS;
+}
+
+void*
+DynamicArrayGetElemPtrByIndex (d_array_t* const array,
+                               const size_t index)
+{
+    if (array == NULL ||
+        index >= array->capacity)
+        return NULL;
+
+    return (char*)array->data + (index * array->element_size);
+}
+//-------------------------------------
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+
+
+
+//-----------------------------------------------------------------------------
+// Static functions implementation
+//-----------------------------------------------------------------------------
+//-------------------------------------
+// Realloc functions
+static d_array_error_t
+DynamicArrayRealloc (d_array_t* const array)
+{
+    if (DynamicArrayCheckRealloc (array) == true)
+        return DynamicArrayExecuteRealloc (array);
+
+    return DYNAMIC_ARRAY_SUCCESS;
+}
+
+static d_array_realloc_status_t
+DynamicArrayCheckRealloc (d_array_t* const array)
+{
+    const size_t size     = array->size;
+    const size_t capacity = array->capacity;
+
+    if (capacity == 0)
+    {
+        array->capacity = 1;
+        return true;
+    }
+
+    else if (size == capacity)
+    {
+        array->capacity *= DYNAMIC_ARRAY_RESIZE_MULTIPLIER;
+        return true;
+    }
+
+    else if (size < capacity / DYNAMIC_ARRAY_RESIZE_MULTIPLIER / 
+                               DYNAMIC_ARRAY_RESIZE_MULTIPLIER)
+    {
+        array->capacity /= DYNAMIC_ARRAY_RESIZE_MULTIPLIER;
+        return true;
+    }
+
+    return false;
+}
+
+static d_array_error_t
+DynamicArrayExecuteRealloc (d_array_t* const array)
+{
+    if (array == NULL) return DYNAMIC_ARRAY_ERROR;
+
+    const size_t num_of_bytes = array->capacity * array->element_size;
+
+    void* const new_ptr = realloc (array->data, num_of_bytes);
+    if (new_ptr == NULL)
+        return DYNAMIC_ARRAY_ERROR;
+
+    array->data = new_ptr;
+    return DYNAMIC_ARRAY_SUCCESS;
+}
+//-------------------------------------
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 
 
 
@@ -1009,30 +1340,28 @@ int key_cmp (const splay_key* const key1, const splay_key* const key2)
     return strcmp (key1->key, key2->key);
 }
 
-splay_key*
-InputKeyConstructor (void)
+void
+ReadString (d_array_t* const input_array)
 {
-    char* const key_str = (char*) calloc (STRING_MAX_LEN, sizeof (char));
-    assert (key_str);
+    assert (input_array);
 
-    splay_key* const key = SplayKeyConstructor (NULL, 0);
-    assert (key);
-    key->key = key_str;
+    input_array->size = 0;
+    char c = 0;
 
-    return key;
-}
+    while (true)
+    {
+        c = getchar ();
 
-splay_value*
-InputValueConstructor (void)
-{
-    char* const value_str = (char*) calloc (STRING_MAX_LEN, sizeof (char));
-    assert (value_str);
+        if (isspace (c))
+        {
+            c = '\0';
+            DynamicArrayPush (input_array, &c);
+            break;
+        }
 
-    splay_value* const value = SplayValueConstructor (NULL, 0);
-    assert (value);
-    value->value = value_str;
-
-    return value;
+        else
+            DynamicArrayPush (input_array, &c);
+    }
 }
 
 void
@@ -1040,22 +1369,41 @@ ReadTree (splay_tree* const tree,
           splay_tree* const rev_tree,
           const size_t N)
 {
-    // asserts are made in constructors
-    splay_key*   key   = InputKeyConstructor   ();
-    splay_value* value = InputValueConstructor ();
+    d_array_t* key_str = DynamicArrayConstructor (sizeof (char));
+    assert (key_str);
+    
+    d_array_t* value_str = DynamicArrayConstructor (sizeof (char));
+    assert (value_str);
+
+    splay_key* key = SplayKeyConstructor (NULL, 0);
+    assert (key);
+
+    splay_value* value = SplayValueConstructor (NULL, 0);
+    assert (value);
 
     for (size_t i = 0; i < N; ++i)
     {
-        assert (scanf ("%1024s %1024s", (char*)key->key, (char*)value->value) == 2);
-        key->key_len     = strlen (key->key)     + 1;
-        value->value_len = strlen (value->value) + 1;
+        ReadString (key_str);
+        ReadString (value_str);
+
+        key->key     = key_str->data;
+        value->value = value_str->data;
+
+        key->key_len     = key_str->size;
+        value->value_len = value_str->size;
 
         SplayTreeInsert (tree, key, value);
         SplayTreeInsert (rev_tree, (splay_key*)value, (splay_value*)key);
     }
 
-    key   = SplayKeyDestructor   (key);
-    value = SplayValueDestructor (value);
+    key_str   = DynamicArrayDestructor (key_str);
+    value_str = DynamicArrayDestructor (value_str);
+
+    key->key     = NULL;
+    value->value = NULL;
+
+    key       = SplayKeyDestructor     (key);
+    value     = SplayValueDestructor   (value);
 }
 
 void
@@ -1063,13 +1411,15 @@ ExecuteRequests (splay_tree* const tree,
                  splay_tree* const rev_tree,
                  const size_t Q)
 {
-    splay_key*  key  = InputKeyConstructor ();
-    splay_node* node = NULL;
+    d_array_t*  key_str = DynamicArrayConstructor (sizeof (char));
+    splay_key*  key     = SplayKeyConstructor (NULL, 0);
+    splay_node* node    = NULL;
 
     for (size_t i = 0; i < Q; ++i)
     {
-        scanf ("%1024s%n", (char*)key->key, (int*)&key->key_len);
-        ++key->key_len;
+        ReadString (key_str);
+        key->key = key_str->data;
+        key->key_len = key_str->size;
 
         node = SplayTreeFind (tree, key);
 
@@ -1079,6 +1429,9 @@ ExecuteRequests (splay_tree* const tree,
         printf ("%s\n", (char*)node->value->value);
     }
 
+    key_str = DynamicArrayDestructor (key_str);
+
+    key->key = NULL;
     key = SplayKeyDestructor (key);
 }
 
@@ -1091,11 +1444,11 @@ int main (void)
     assert (rev_tree);
 
     size_t N = 0;
-    assert (scanf ("%zd", &N) == 1);
+    assert (scanf ("%zd ", &N) == 1);
     ReadTree (tree, rev_tree, N);
 
     size_t Q = 0;
-    assert (scanf ("%zd", &Q) == 1);
+    assert (scanf ("%zd ", &Q) == 1);
     ExecuteRequests (tree, rev_tree, Q);
 
     tree     = SplayTreeDestructor (tree);
