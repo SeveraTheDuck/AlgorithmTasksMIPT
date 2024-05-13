@@ -52,3 +52,5 @@ Still, binomial heap shows twice better performance than k-heap $\mathcal{O}(n\l
 This lab work shows us that binary heap is the best variant for most of occasions (sadly, no fibonacci heap with Dijkstra algorithm), but binomial heap may be used when there is no option to build the heap in-place, insert-only. 
 
 ## References
+1. [Our course presentations](https://drive.google.com/drive/folders/1Y7ywB90fZlR-hQpyNM1d38aT1kOBY4YM).
+2. [ITMO wiki](https://neerc.ifmo.ru/wiki/index.php?title=%D0%91%D0%B8%D0%BD%D0%BE%D0%BC%D0%B8%D0%B0%D0%BB%D1%8C%D0%BD%D0%B0%D1%8F_%D0%BA%D1%83%D1%87%D0%B0)
