@@ -28,6 +28,10 @@ INCLUDE  := -I$(INCLUDE_DIR)
 #------------------------------------------------------------------------------
 
 
+#------------------------------------------------------------------------------
+.PHONY: run_all_tests makeplots
+
+
 
 #------------------------------------------------------------------------------
 # compile main file
@@ -121,3 +125,8 @@ run_all_tests:
 #------------------------------------------------------------------------------
 PY = python
 MAKE_PLOT_SOURCE = $(SOURCE_DIR)make_plot.py
+
+makeplots:
+	@$(PY) $(MAKE_PLOT_SOURCE) $(PLOTS_DIR) k_heap 2 $(BINARY_LINEAR_OUTPUT) $(BINARY_NLOGN_OUTPUT)
+	@$(PY) $(MAKE_PLOT_SOURCE) $(PLOTS_DIR) binomial_heap 2 $(BINARY_LINEAR_OUTPUT) $(BINOMIAL_OUTPUT)
+#------------------------------------------------------------------------------
