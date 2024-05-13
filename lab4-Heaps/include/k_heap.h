@@ -87,6 +87,10 @@ KHeapGetRoot     (k_heap_t* const heap);
 
 k_heap_error_t
 KHeapExtractRoot (k_heap_t* const heap);
+
+k_heap_error_t
+KHeapSiftDown    (k_heap_t* const heap,
+                  const size_t index);
 //-------------------------------------
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
@@ -111,13 +115,6 @@ KHeapValueConstructor (const void* const value,
 
 k_heap_value*
 KHeapValueDestructor  (k_heap_value* const value);
-
-k_heap_item*
-KHeapItemConstructor (const k_heap_key*   const key,
-                      const k_heap_value* const value);
-
-k_heap_item*
-KHeapItemDestructor  (k_heap_item* const item);
 //-------------------------------------
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------

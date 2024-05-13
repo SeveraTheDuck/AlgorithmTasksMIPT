@@ -20,10 +20,6 @@ static k_heap_error_t
 KHeapSiftUp (k_heap_t* const heap,
              const size_t index);
 
-static k_heap_error_t
-KHeapSiftDown (k_heap_t* const heap,
-               const size_t index);
-
 static k_heap_key*
 KHeapKeyCopy (const k_heap_key* const key);
 
@@ -53,6 +49,10 @@ KHeapConstructor (const size_t k,
                   int (*key_cmp) (const k_heap_key* const,
                                   const k_heap_key* const))
 {
+    if (infinity_key == NULL ||
+        key_cmp      == NULL)
+        return NULL;
+
     k_heap_t* const heap = (k_heap_t*) malloc (sizeof (k_heap_t));
     if (heap == NULL)
         return NULL;
@@ -81,7 +81,7 @@ KHeapDestructor  (k_heap_t* const heap)
         
         if (cur_item != NULL)
         {
-            cur_item->key   = KHeapKeyDestructor (cur_item->key);
+            cur_item->key   = KHeapKeyDestructor   (cur_item->key);
             cur_item->value = KHeapValueDestructor (cur_item->value);
         }
     }
@@ -242,7 +242,7 @@ KHeapSiftUp (k_heap_t* const heap,
     return K_HEAP_SUCCESS;
 }
 
-static k_heap_error_t
+k_heap_error_t
 KHeapSiftDown (k_heap_t* const heap,
                const size_t index)
 {

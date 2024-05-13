@@ -1,5 +1,8 @@
 #pragma once
+
+#include <assert.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <time.h>
 
 
@@ -13,7 +16,8 @@ enum int_cmp_status
 
 
 
-int CompareInt (const void* const a, const void* const b);
+int
+CompareInt (const void* const a, const void* const b);
 
 int*
 ReadIntArray (const size_t elem_number);
