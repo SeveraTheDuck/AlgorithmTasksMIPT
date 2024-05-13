@@ -16,20 +16,6 @@ typedef struct k_heap_key
 }
 k_heap_key;
 
-typedef struct k_heap_value
-{
-    void*  value;
-    size_t value_len;
-}
-k_heap_value;
-
-typedef struct k_heap_item
-{
-    k_heap_key*   key;
-    k_heap_value* value;
-}
-k_heap_item;
-
 typedef struct k_heap
 {
     d_array_t*  array;
@@ -78,11 +64,14 @@ KHeapDestructor  (k_heap_t* const heap);
 //-------------------------------------
 // Interface
 k_heap_error_t
-KHeapInsert      (k_heap_t*           const heap,
-                  const k_heap_key*   const key,
-                  const k_heap_value* const value);
+KHeapInsert      (k_heap_t*         const heap,
+                  const k_heap_key* const key);
 
-k_heap_value*
+k_heap_error_t
+KHeapInsertNoRealloc (k_heap_t*         const heap,
+                      const k_heap_key* const key);
+
+k_heap_key*
 KHeapGetRoot     (k_heap_t* const heap);
 
 k_heap_error_t
@@ -98,7 +87,7 @@ KHeapSiftDown    (k_heap_t* const heap,
 
 
 //-----------------------------------------------------------------------------
-// K-heap key, value and item functions
+// K-heap key functions
 //-----------------------------------------------------------------------------
 //-------------------------------------
 // Сonstructor and destructor
@@ -108,13 +97,6 @@ KHeapKeyConstructor   (const void* const key,
 
 k_heap_key*
 KHeapKeyDestructor    (k_heap_key* const key);
-
-k_heap_value*
-KHeapValueConstructor (const void* const value,
-                       const size_t value_len);
-
-k_heap_value*
-KHeapValueDestructor  (k_heap_value* const value);
 //-------------------------------------
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------

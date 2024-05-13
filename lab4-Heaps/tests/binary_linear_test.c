@@ -64,12 +64,11 @@ KHeapLinear (d_array_t* const d_array)
 d_array_t*
 ReadDynamicArray (const size_t elem_number)
 {
-    k_heap_item item = {.key = NULL, .value = NULL};
-
-    d_array_t* const d_array = DynamicArrayConstructor (sizeof (k_heap_item));
+    d_array_t* const d_array = DynamicArrayConstructor (sizeof (k_heap_key*));
     assert (d_array);
 
     int input = 0;
+    k_heap_key* key = NULL;
 
     for (size_t i = 0; i < elem_number; ++i)
     {
@@ -81,8 +80,8 @@ ReadDynamicArray (const size_t elem_number)
             return DynamicArrayDestructor (d_array);
         }
 
-        item.key = KHeapKeyConstructor (&input, sizeof (int));
-        DynamicArrayPush (d_array, &item);
+        key = KHeapKeyConstructor (&input, sizeof (int));
+        DynamicArrayPush (d_array, &key);
     }
     return d_array;
 }
