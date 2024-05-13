@@ -1,7 +1,6 @@
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
-#include <time.h>
 
 // process name and number of elements
 const int      MIN_ARG_NUMBER        = 2;

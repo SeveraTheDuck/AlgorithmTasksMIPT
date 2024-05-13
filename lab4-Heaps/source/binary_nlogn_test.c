@@ -95,6 +95,8 @@ int main (void)
 {
     size_t elem_number = 0;
     assert (scanf ("%zd", &elem_number) == 1);
+
+    printf ("%zu ", elem_number);
     
     d_array_t* const d_array = ReadDynamicArray (elem_number);
     assert (d_array);

@@ -31,10 +31,13 @@ int main (void)
     size_t elem_number = 0;
     assert (scanf ("%zd", &elem_number) == 1);
 
+    printf ("%zu ", elem_number);
+
     int* const array = ReadIntArray (elem_number);
     assert (array);
 
     printf ("%ld\n", BinomialHeapTest (array, elem_number));
 
+    free (array);
     return 0;
 }
