@@ -37,10 +37,14 @@ So for amortized $a_i = t_i + \phi_{i} - \phi_{i - 1} = 1$ or $2$ = $\mathcal{O}
 Which means the total time complexity is $\mathcal{O}(n)$.
 
 3. **K-heap build methods comparison**
-![k-heap](./plots/k_heap.png)
+<figure>
+<img src="plots/k_heap.png" width=600>
+</figure>
 
 4. **K-heap linear build vs binomial heap build**
-![binomial](./plots/binomial_heap.png)
+<figure>
+<img src="plots/binomial_heap.png" width=600>
+</figure>
 
 5. **Conclusion**
 Despite the fact that k-heap is implemented with `void*` type, which means a lot of allocations and memory copying functions, and binomial heap is implemented with `int` type, k-heap linear build is around $3$ times faster than binomial heap.
