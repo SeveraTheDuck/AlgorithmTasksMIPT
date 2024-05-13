@@ -12,7 +12,7 @@
 1. Download or copy [repository](https://github.com/SeveraTheDuck/AlgorithmTasksMIPT/tree/lab4-Heaps).
 2. Open terminal in lab4-Heaps folder.
 3. To make tests input, run `make maketests` command via terminal.
-4. To run tests, run `make maketests` command via terminal.
+4. To run tests, run `make run_all_tests` command via terminal.
 5. To make plots, run `make makeplots` command via terminal.
 6. Done :3
 
