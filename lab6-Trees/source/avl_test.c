@@ -42,7 +42,7 @@ AVLTreeTestInserts (avl_tree* const tree,
     begin = clock ();
     for (size_t i = 0; i < elem_number; ++i)
     {
-        AVLTreeKeySetData (key, GetRandomElement (array));
+        AVLTreeKeySetData (key, array->array[i]);
         AVLTreeDelete     (tree, key);
     }
     end = clock ();
@@ -68,7 +68,7 @@ AVLTreeTestDeletes (avl_tree* const tree,
     begin = clock ();
     for (size_t i = 0; i < op_number; ++i)
     {
-        AVLTreeKeySetData (key, array->array[i]);
+        AVLTreeKeySetData (key, GetRandomElement (array));
         AVLTreeInsert     (tree, key, NULL);
     }
     end = clock ();
