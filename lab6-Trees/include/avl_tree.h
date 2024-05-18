@@ -21,27 +21,25 @@ enum avl_tree_rotates
 //-----------------------------------------------------------------------------
 // AVL-tree structs and types
 //-----------------------------------------------------------------------------
-typedef
-struct avl_tree_key
+typedef struct avl_tree_key
 {
     void*  data;
     size_t key_size;
 }
 avl_tree_key;
 
-typedef
-struct avl_tree_value
+typedef struct avl_tree_value
 {
     void*  data;
     size_t value_size;
 }
 avl_tree_value;
 
-typedef
-struct avl_tree_node
+typedef struct avl_tree_node
 {
     avl_tree_key*         key;
     avl_tree_value*       value;
+
     struct avl_tree_node* left;
     struct avl_tree_node* right;
 
@@ -49,11 +47,9 @@ struct avl_tree_node
 }
 avl_tree_node;
 
-typedef
-struct avl_tree
+typedef struct avl_tree
 {
     avl_tree_node* root;
-    size_t elem_num;
     int (*key_cmp) (const avl_tree_key* const,
                     const avl_tree_key* const);
 }

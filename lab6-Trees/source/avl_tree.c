@@ -83,7 +83,6 @@ AVLTreeConstructor (int (*key_cmp) (const avl_tree_key* const,
     if (tree == NULL) return NULL;
 
     tree->key_cmp  = key_cmp;
-    tree->elem_num = 0;
     tree->root     = NULL;
 
     return tree;
@@ -121,7 +120,6 @@ AVLTreeInsert (avl_tree*             const tree,
     if (new_root == NULL) return AVL_TREE_ERROR;
 
     tree->root = new_root;
-    tree->elem_num++;
 
     return AVL_TREE_SUCCESS;
 }
@@ -134,7 +132,6 @@ AVLTreeDelete (avl_tree*           const tree,
     if (del_node == NULL) return AVL_TREE_ERROR;
 
     tree->root = AVLTreeDeleteImpl (tree, tree->root, key);
-    tree->elem_num--;
 
     return AVL_TREE_SUCCESS;
 }
@@ -352,8 +349,6 @@ AVLTreeDeleteBranch (avl_tree*      const tree,
 
     node->left  = AVLTreeDeleteBranch (tree, node->left);
     node->right = AVLTreeDeleteBranch (tree, node->right);
-
-    tree->elem_num--;
 
     return AVLTreeNodeDestructor (node);
 }
