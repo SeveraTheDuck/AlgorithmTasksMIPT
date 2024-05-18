@@ -1,8 +1,5 @@
 #include "../include/avl_tree.h"
-#include <limits.h>
-#include <stdbool.h>
-#include <stdio.h>
-#include <assert.h>
+
 
 
 //-----------------------------------------------------------------------------
@@ -27,11 +24,13 @@ AVLTreeInsertImpl      (avl_tree*             const tree,
                         const avl_tree_value* const value);
 
 static avl_tree_node*
-AVLTreeDeleteImpl      (avl_tree*      const tree,
-                        avl_tree_node* const key);
+AVLTreeDeleteImpl      (avl_tree*           const tree,
+                        avl_tree_node*      const node,
+                        const avl_tree_key* const key);
 
-static avl_tree_node*
-AVLTreeUnlinkMax       (avl_tree_node* const node);
+static void
+AVLTreeReplaceKeyAndValue (avl_tree_node*       const node,
+                           const avl_tree_node* const replacement);
 
 static avl_tree_node*
 AVLTreeFindMaxInBranch (avl_tree_node* const node);
@@ -134,9 +133,7 @@ AVLTreeDelete (avl_tree*           const tree,
     avl_tree_node* const del_node = AVLTreeFindKey (tree, key);
     if (del_node == NULL) return AVL_TREE_ERROR;
 
-    printf ("AAA\n");
-
-    tree->root = AVLTreeDeleteImpl (tree, del_node);
+    tree->root = AVLTreeDeleteImpl (tree, tree->root, key);
     tree->elem_num--;
 
     return AVL_TREE_SUCCESS;
@@ -178,7 +175,7 @@ AVLTreeNodeConstructor (const avl_tree_key*   const key,
                         const avl_tree_value* const value)
 {
     avl_tree_node* const node =
-        (avl_tree_node*) malloc (sizeof (avl_tree_node));
+        (avl_tree_node*) calloc (1, sizeof (avl_tree_node));
     if (node == NULL) return NULL;
 
     node->key   = AVLTreeKeyCopy   (key);
@@ -393,31 +390,50 @@ AVLTreeFindMaxInBranch (avl_tree_node* const node)
 }
 
 static avl_tree_node*
-AVLTreeDeleteImpl (avl_tree*      const tree,
-                   avl_tree_node* const node)
+AVLTreeDeleteImpl (avl_tree*           const tree,
+                   avl_tree_node*      const node,
+                   const avl_tree_key* const key)
 {
-    avl_tree_node* replace_node = NULL;
-
+    if (node == NULL) return NULL;
     
-    replace_node = AVLTreeFindMaxInBranch (node->left);
-    if (replace_node == NULL) replace_node = node->right;
+    avl_tree_node* replacement = NULL;
 
-    node->left = AVLTreeUnlinkMax (node->left);
+    if (tree->key_cmp (key, node->key) == AVL_TREE_CMP_LESS)
+        node->left = AVLTreeDeleteImpl (tree, node->left, key);
 
-    replace_node->left  = node->left;
-    replace_node->right = node->right;
-    
-    AVLTreeNodeDestructor (node);
-    return AVLTreeFixBalance (replace_node);
-}
+    else if (tree->key_cmp (key, node->key) == AVL_TREE_CMP_GREATER)
+        node->right = AVLTreeDeleteImpl (tree, node->right, key);
 
-static avl_tree_node*
-AVLTreeUnlinkMax (avl_tree_node* const node)
-{
-    if (node->right == NULL) return node;
-    node->right = AVLTreeUnlinkMax (node->right);
+    else
+    {
+        if (node->left == NULL || node->right == NULL)
+        {
+            replacement = node->left ? node->left : node->right;
+
+            AVLTreeNodeDestructor (node);
+            return AVLTreeFixBalance (replacement);
+        }
+
+        replacement = AVLTreeFindMaxInBranch (node->left);
+        AVLTreeReplaceKeyAndValue (node, replacement);
+        
+        node->left = AVLTreeDeleteImpl (tree, node->left, replacement->key);
+    }
 
     return AVLTreeFixBalance (node);
+}
+
+static void
+AVLTreeReplaceKeyAndValue (avl_tree_node*       const node,
+                           const avl_tree_node* const replacement)
+{
+    if (node == NULL || replacement == NULL) return;
+    
+    node->key = AVLTreeKeyDestructor  (node->key);
+    node->key = AVLTreeKeyCopy (replacement->key);
+
+    node->value = AVLTreeValueDestructor  (node->value);
+    node->value = AVLTreeValueCopy (replacement->value);
 }
 
 static avl_tree_key*
@@ -459,80 +475,3 @@ MaxInt (const int a, const int b)
 //-------------------------------------
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-
-
-
-//-----------------------------------------------------------------------------
-// Main to check delete function
-//-----------------------------------------------------------------------------
-int key_cmp_f (const avl_tree_key* const a,
-               const avl_tree_key* const b)
-{
-    assert (a);
-    assert (b);
-
-    const size_t a_val = *(const size_t*) a->data;
-    const size_t b_val = *(const size_t*) b->data;
-
-    if (a_val < b_val) return AVL_TREE_CMP_LESS;
-    if (a_val > b_val) return AVL_TREE_CMP_GREATER;
-    return AVL_TREE_CMP_EQUAL;
-}
-
-void
-PrintTreePreOrderImpl (const avl_tree_node* const node)
-{
-    if (node == NULL)
-    {
-        printf ("nil ");
-        return;
-    }
-
-    printf ("(");
-    printf ("%zu ", *(const size_t*) node->key->data);
-    PrintTreePreOrderImpl (node->left);
-    PrintTreePreOrderImpl (node->right);
-    printf (")");
-}
-
-void
-PrintTreePreOrder (const avl_tree* const tree)
-{
-    if (tree == NULL) printf ("\n!!! NULL tree recieved !!!\n");
-
-    PrintTreePreOrderImpl (tree->root);
-    printf ("\n");
-}
-
-void
-AVLTreeKeySetValue (avl_tree_key* const key,
-                    const size_t value)
-{
-    assert (key);
-    *(size_t*)(key->data) = value;
-}
-
-int main (void)
-{
-    const size_t n = 10;
-
-    avl_tree* tree = AVLTreeConstructor (key_cmp_f);
-    assert (tree);
-
-    avl_tree_key* key = AVLTreeKeyConstructor (&n, sizeof (size_t));
-
-    for (size_t i = 0; i < n; ++i)
-    {
-        AVLTreeKeySetValue (key, i);
-        AVLTreeInsert (tree, key, NULL);
-        PrintTreePreOrder (tree);
-    }
-
-    AVLTreeKeySetValue (key, 5);
-    AVLTreeDelete      (tree, key);
-    PrintTreePreOrder  (tree);
-
-    key  = AVLTreeKeyDestructor (key);
-    tree = AVLTreeDestructor    (tree);
-    return 0;
-}
