@@ -445,16 +445,16 @@ SplayTreeFind (splay_tree*      const tree,
         key  == NULL) return NULL;
 
     splay_node* node = tree->root;
-    int direction    = 0;
+    int cmp_status   = 0;
 
     while (node != NULL)
     {
-        direction = strcmp (key->key, node->key->key);
+        cmp_status = tree->key_cmp (key, node->key);
 
-        if (direction < 0)
+        if (cmp_status == SPLAY_TREE_CMP_LESS)
             node = node->left;
 
-        else if (direction > 0)
+        else if (cmp_status == SPLAY_TREE_CMP_GREATER)
             node = node->right;
 
         else
