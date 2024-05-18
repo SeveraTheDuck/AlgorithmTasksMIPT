@@ -8,15 +8,15 @@
 //-----------------------------------------------------------------------------
 typedef struct treap_key
 {
-    void*  key;
-    size_t size;  ///< size in bytes
+    void*  data;
+    size_t key_size;  ///< size in bytes
 }
 treap_key;
 
 typedef struct treap_value
 {
-    void*  value;
-    size_t size;  ///< size in bytes
+    void*  data;
+    size_t value_size;  ///< size in bytes
 }
 treap_value;
 
@@ -91,15 +91,15 @@ TreapNodeDestructor  (treap_node* const node);
 //-------------------------------------
 // Treap key and value constructor and destructor and copy
 treap_key*
-TreapKeyConstructor   (const void* const key,
-                       const size_t size);
+TreapKeyConstructor   (const void* const data,
+                       const size_t key_size);
 
 treap_key*
 TreapKeyDestructor    (treap_key* const key);
 
 treap_value*
-TreapValueConstructor (const void* const value,
-                       const size_t size);
+TreapValueConstructor (const void* const data,
+                       const size_t value_size);
 
 treap_value*
 TreapValueDestructor  (treap_value* const value);

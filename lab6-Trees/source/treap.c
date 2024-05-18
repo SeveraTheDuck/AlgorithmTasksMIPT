@@ -123,24 +123,24 @@ TreapNodeDestructor (treap_node* const node)
 //-------------------------------------
 // Key and value constructor and destructor
 treap_key*
-TreapKeyConstructor (const void* const key,
-                     const size_t size)
+TreapKeyConstructor (const void* const data,
+                     const size_t key_size)
 {
-    treap_key* const new_key =
+    treap_key* const key =
         (treap_key*) calloc (1, sizeof (treap_key));
-    if (new_key == NULL) return NULL;
+    if (key == NULL) return NULL;
 
-    if (key != NULL && size != 0)
+    if (data != NULL && key_size != 0)
     {
-        new_key->key = malloc (size);
-        if (new_key->key == NULL)
-            return TreapKeyDestructor (new_key);
+        key->data = malloc (key_size);
+        if (key->data == NULL)
+            return TreapKeyDestructor (key);
 
-        memcpy (new_key->key, key, size);
-        new_key->size = size;
+        memcpy (key->data, data, key_size);
+        key->key_size = key_size;
     }
 
-    return new_key;
+    return key;
 }
 
 treap_key*
@@ -148,30 +148,30 @@ TreapKeyDestructor (treap_key* const key)
 {
     if (key == NULL) return NULL;
 
-    free (key->key);
+    free (key->data);
     free (key);
     return NULL;
 }
 
 treap_value*
-TreapValueConstructor (const void* const value,
-                       const size_t size)
+TreapValueConstructor (const void* const data,
+                       const size_t value_size)
 {
-    treap_value* const new_value =
+    treap_value* const value =
         (treap_value*) calloc (1, sizeof (treap_value));
-    if (new_value == NULL) return NULL;
+    if (value == NULL) return NULL;
 
-    if (value != NULL && size != 0)
+    if (data != NULL && value_size != 0)
     {
-        new_value->value = malloc (size);
-        if (new_value->value == NULL)
-            return TreapValueDestructor (new_value);
+        value->data = malloc (value_size);
+        if (value->data == NULL)
+            return TreapValueDestructor (value);
 
-        memcpy (new_value->value, value, size);
-        new_value->size = size;
+        memcpy (value->data, data, value_size);
+        value->value_size = value_size;
     }
 
-    return new_value;
+    return value;
 }
 
 treap_value*
@@ -179,7 +179,7 @@ TreapValueDestructor (treap_value* const value)
 {
     if (value == NULL) return NULL;
 
-    free (value->value);
+    free (value->data);
     free (value);
     return NULL;
 }
@@ -290,14 +290,14 @@ static treap_key*
 TreapKeyCopy (const treap_key* const key)
 {
     if (key == NULL) return NULL;
-    return TreapKeyConstructor (key->key, key->size);
+    return TreapKeyConstructor (key->data, key->key_size);
 }
 
 static treap_value*
 TreapValueCopy (const treap_value* const value)
 {
     if (value == NULL) return NULL;
-    return TreapValueConstructor (value->value, value->size);
+    return TreapValueConstructor (value->data, value->value_size);
 }
 //-------------------------------------
 
