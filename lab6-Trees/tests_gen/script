@@ -61,6 +61,8 @@ for (( cur_size=$from; cur_size <= $to; cur_size += $step))
 do
     for (( cur_test=1; cur_test <= repeat_num; cur_test += 1))
     do
+        touch "$tests_dir/$cur_size""_$cur_test.in"
+        >"$tests_dir/$cur_size""_$cur_test.in"
         ./$gen_array_exe $cur_size $max_elem_value >> "$tests_dir/$cur_size""_$cur_test.in"
     done
 done

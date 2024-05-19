@@ -17,7 +17,7 @@ int main (const int argc, const char** const argv)
     const size_t elem_number =
         (size_t) atoll (argv[ELEM_NUMBER_ARG_INDEX]);
 
-    srand (time (NULL) + (int)argv);
+    srand (time (NULL) + (long long)argv);
 
     printf ("%zd\n", elem_number);
 
