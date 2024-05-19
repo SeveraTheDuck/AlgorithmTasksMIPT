@@ -423,6 +423,7 @@ SplayTreeDeleteKey (splay_tree*      const tree,
 
         Splay (tree, SplayFindMaxKey (tree));
         tree->root->right = prev_right;
+        if (prev_right) prev_right->parent = tree->root;
     }
 
     else
@@ -449,6 +450,7 @@ SplayTreeFind (splay_tree*      const tree,
 
     while (node != NULL)
     {
+        // printf ("%p ", node);
         cmp_status = tree->key_cmp (key, node->key);
 
         if (cmp_status == SPLAY_TREE_CMP_LESS)

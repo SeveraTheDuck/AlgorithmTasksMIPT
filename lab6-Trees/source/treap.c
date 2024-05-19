@@ -422,7 +422,7 @@ TreapDeleteFoundNode (treap_pair* const pair,
         next = next->left;
     }
 
-    cur->left = found_node->right;
+    cur->left = TreapMerge (found_node->left, found_node->right);
     TreapNodeDestructor (found_node);
 
     return TREAP_SUCCESS;
