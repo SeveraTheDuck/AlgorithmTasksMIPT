@@ -43,11 +43,12 @@ SplayTreeTestInserts (splay_tree* const tree,
     for (size_t i = 0; i < elem_number; ++i)
     {
         SplayTreeKeySetData (key, array->array[i]);
-        SplayTreeDeleteKey  (tree, key);
+        SplayTreeInsert     (tree, key, NULL);
     }
     end = clock ();
 
-    fprintf (output_file, "%zu %lu\n", elem_number, end - begin);
+    fprintf (output_file, "%zu %lg\n", elem_number,
+            (double)(end - begin) / CLOCKS_PER_SEC);
     fclose (output_file);
 }
 
@@ -68,12 +69,13 @@ SplayTreeTestDeletes (splay_tree* const tree,
     begin = clock ();
     for (size_t i = 0; i < op_number; ++i)
     {
-        SplayTreeKeySetData (key, GetRandomElement (array));
-        SplayTreeInsert     (tree, key, NULL);
+        SplayTreeKeySetData (key, array->array[i]);
+        SplayTreeDeleteKey  (tree, key);
     }
     end = clock ();
 
-    fprintf (output_file, "%zu %lu\n", elem_number, end - begin);
+    fprintf (output_file, "%zu %lg\n", elem_number,
+            (double)(end - begin) / CLOCKS_PER_SEC);
     fclose (output_file);
 }
 

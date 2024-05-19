@@ -43,11 +43,12 @@ TreapTestInserts (treap* const tree,
     for (size_t i = 0; i < elem_number; ++i)
     {
         TreapKeySetData (key, array->array[i]);
-        TreapDelete     (tree, key);
+        TreapInsert     (tree, key, NULL);
     }
     end = clock ();
 
-    fprintf (output_file, "%zu %lu\n", elem_number, end - begin);
+    fprintf (output_file, "%zu %lg\n", elem_number,
+            (double)(end - begin) / CLOCKS_PER_SEC);
     fclose (output_file);
 }
 
@@ -68,12 +69,13 @@ TreapTestDeletes (treap* const tree,
     begin = clock ();
     for (size_t i = 0; i < op_number; ++i)
     {
-        TreapKeySetData (key, GetRandomElement (array));
-        TreapInsert     (tree, key, NULL);
+        TreapKeySetData (key, array->array[i]);
+        TreapDelete     (tree, key);
     }
     end = clock ();
 
-    fprintf (output_file, "%zu %lu\n", elem_number, end - begin);
+    fprintf (output_file, "%zu %lg\n", elem_number,
+            (double)(end - begin) / CLOCKS_PER_SEC);
     fclose (output_file);
 }
 

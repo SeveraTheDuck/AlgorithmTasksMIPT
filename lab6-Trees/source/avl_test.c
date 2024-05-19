@@ -43,11 +43,12 @@ AVLTreeTestInserts (avl_tree* const tree,
     for (size_t i = 0; i < elem_number; ++i)
     {
         AVLTreeKeySetData (key, array->array[i]);
-        AVLTreeDelete     (tree, key);
+        AVLTreeInsert     (tree, key, NULL);
     }
     end = clock ();
 
-    fprintf (output_file, "%zu %lu\n", elem_number, end - begin);
+    fprintf (output_file, "%zu %lg\n", elem_number,
+            (double)(end - begin) / CLOCKS_PER_SEC);
     fclose (output_file);
 }
 
@@ -68,12 +69,13 @@ AVLTreeTestDeletes (avl_tree* const tree,
     begin = clock ();
     for (size_t i = 0; i < op_number; ++i)
     {
-        AVLTreeKeySetData (key, GetRandomElement (array));
-        AVLTreeInsert     (tree, key, NULL);
+        AVLTreeKeySetData (key, array->array[i]);
+        AVLTreeDelete     (tree, key);
     }
     end = clock ();
 
-    fprintf (output_file, "%zu %lu\n", elem_number, end - begin);
+    fprintf (output_file, "%zu %lg\n", elem_number,
+            (double)(end - begin) / CLOCKS_PER_SEC);
     fclose (output_file);
 }
 
